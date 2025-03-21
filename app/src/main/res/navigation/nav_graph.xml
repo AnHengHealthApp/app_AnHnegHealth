@@ -7,16 +7,19 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="com.example.ahhapp.HomeFragment"
+        android:label="首頁"
         />
 
     <fragment
         android:id="@+id/nav_notify"
         android:name="com.example.ahhapp.NotifyFragment"
+        android:label="通知"
         />
 
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.ahhapp.InfoFragment"
+        android:label="個人"
        />
 
 </navigation>

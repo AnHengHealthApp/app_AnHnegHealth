@@ -26,6 +26,9 @@ public class BoardActivity extends AppCompatActivity {
         // 找到底部導航欄的 View
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
+        //預設是選擇home鍵
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+
         // 導覽頁監聽
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
