@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<!--左側按鈕 通知-->
+    <item
+        android:id="@+id/nav_notify"
+        android:icon="@drawable/ic_bell"
+        android:background="@drawable/header_btn_selector_bg"
+        android:checkable="true"
+        android:title="通知"
+        tools:ignore="MenuTitle" />
+
+<!--中間按鈕 首頁    -->
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:background="@drawable/header_btn_selector_bg"
+        android:title="首頁"
+        android:checkable="true"
+        tools:ignore="MenuTitle" />
+
+<!--右側按鈕 詳細資訊    -->
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="資訊"
+        android:checkable="true"
+        android:background="@drawable/header_btn_selector_bg"
+        tools:ignore="MenuTitle" />
+
+</menu>

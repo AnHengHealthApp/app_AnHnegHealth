@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#C8E0C7"/> <!-- 設置背景顏色 -->
+    <corners android:radius="12dp"/> <!-- 設置圓角 -->
+</shape>

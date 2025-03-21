@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#C8F5CC">
+
+        <!-- 上方使用者資訊 (頭像 + Username) -->
+        <LinearLayout
+            android:id="@+id/etProfile"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/home_header_bg"
+            android:padding="15dp">
+
+            <!-- 左側圖片 -->
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_header_edit"
+                android:scaleType="centerInside" />
+
+            <!-- 中間使用者名稱 -->
+            <TextView
+                android:id="@+id/tvUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Username"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/ivUserPhoto"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_user_photo"
+                android:scaleType="centerInside" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnEditHealthInfo"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_edit"
+                android:text="編輯健康資訊與紀錄"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:padding="12dp"
+                android:background="@drawable/home_item_bg"
+                android:backgroundTint="@null"
+                android:textColor="#111111"/>
+
+            <Button
+                android:id="@+id/btnAIQA"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:text="AI智能問答"
+                android:drawableLeft="@drawable/ic_ai"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:padding="12dp"
+                android:background="@drawable/home_item_bg"
+                android:textColor="#111111"/>
+
+            <Button
+                android:id="@+id/btnMedicationReminder"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:text="用藥提醒"
+                android:drawableLeft="@drawable/ic_pill"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:padding="12dp"
+                android:background="@drawable/home_item_bg"
+                android:textColor="#111111"/>
+
+            <Button
+                android:id="@+id/btnHealthChart"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:textSize="20sp"
+                android:drawableLeft="@drawable/ic_chart"
+                android:layout_weight="1"
+                android:text="健康曲線圖"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:padding="12dp"
+                android:background="@drawable/home_item_bg"
+                android:textColor="#111111"/>
+
+            <Button
+                android:id="@+id/btnErrorReport"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:text="錯誤回報"
+                android:drawableLeft="@drawable/ic_report"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
+                android:padding="12dp"
+                android:background="@drawable/home_item_bg"
+                android:textColor="#111111"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

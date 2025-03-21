@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C8F5CC"
+    tools:context=".MainActivity">
+
+    <!-- 登入畫面整體包在 LinearLayout 中 -->
+    <LinearLayout
+        android:id="@+id/login_section"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <ImageView
+            android:id="@+id/logo_image"
+            android:layout_width="wrap_content"
+            android:layout_height="270dp"
+            android:src="@drawable/logo"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="fitCenter"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="安衡健康助手"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="帳戶資訊"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_gravity="left"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/et_account"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="帳號"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="10dp"/>
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:hint="密碼"
+            android:inputType="textPassword"
+            android:background="@drawable/edittext_background"
+            android:padding="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_forgot_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="忘記密碼?"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="end"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"/>
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="登入"
+            android:textSize="16sp"
+            android:background="@drawable/login_btn_bg"
+            android:textColor="@color/black"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="註冊"
+            android:textSize="16sp"
+            android:background="@drawable/login_btn_bg"
+            android:textColor="@color/black"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <!-- 忘記密碼 Fragment 將會完全覆蓋在上方 -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+</FrameLayout>

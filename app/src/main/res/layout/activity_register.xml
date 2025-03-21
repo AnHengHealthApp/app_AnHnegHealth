@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#C8F5CC"
+    tools:ignore="UselessParent">
+
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        android:layout_gravity="left"
+        android:scaleType="fitCenter"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="240dp"
+        android:src="@drawable/logo"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="fitCenter"
+        tools:ignore="ContentDescription,VisualLintBounds" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="安衡健康助手"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/text_Account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="帳戶資訊"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_gravity="left"
+        android:layout_marginTop="20dp"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <EditText
+        android:id="@+id/et_account"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_background"
+        android:hint="帳號"
+        android:padding="10dp"
+        tools:ignore="Autofill,HardcodedText,TextFields,VisualLintTextFieldSize" />
+
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_background"
+        android:hint="密碼"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_background"
+        android:hint="使用者名稱"
+        android:inputType="text"
+        android:padding="10dp"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <EditText
+        android:id="@+id/et_email"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_background"
+        android:hint="信箱"
+        android:inputType="textEmailAddress"
+        android:padding="10dp"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="註冊"
+        android:textSize="16sp"
+        android:background="@drawable/register_btn_bg"
+        android:textColor="@color/black"
+        android:layout_marginTop="10dp"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+</LinearLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 選中狀態 -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/pressed_bg_color" />
+            <corners android:radius="16dp" /> <!-- 圓角 -->
+        </shape>
+    </item>
+
+    <!-- 預設狀態 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/default_bg_color" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+
+</selector>

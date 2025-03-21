@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#C8F5CC">
+
+        <!--返回鍵-->
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"
+            android:padding="20dp"
+            android:layout_gravity="left"
+            android:scaleType="fitCenter"
+            />
+        <!-- 上方使用者資訊 (頭像 + Username) -->
+        <LinearLayout
+            android:id="@+id/etProfile"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/home_header_bg"
+            android:padding="15dp">
+
+            <!-- 左側圖片 -->
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_header_edit"
+                android:scaleType="centerInside" />
+
+            <!-- 中間使用者名稱 -->
+            <TextView
+                android:id="@+id/tvUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Username"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/ivUserPhoto"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_user_photo"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <!-- 詳細健康資訊區塊 -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="start">
+
+                <!-- 基本健康資訊 -->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="基本健康資訊"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="身高: 170 cm"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvWeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="體重: 65 kg"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvAge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="年齡: 25 歲"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <!-- 血壓資訊 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="血壓資訊"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAvgHeartRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本週平均心跳: 72 下/分鐘"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvAvgSystolic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本週平均收縮壓: 120 mmHg"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvAvgDiastolic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本週平均舒張壓: 80 mmHg"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvMaxBpDiff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="本週最大血壓差: 40 mmHg"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <!-- 血糖資訊 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="血糖資訊"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAvgFastingGlucose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本週平均空腹血糖: 90 mg/dL"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvAvgPostprandialGlucose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本週平均餐後血糖: 110 mg/dL"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvMaxGlucoseDiff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本週最大血糖差: 20 mg/dL"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </ScrollView>
+
+
+    </LinearLayout>
+</FrameLayout>
