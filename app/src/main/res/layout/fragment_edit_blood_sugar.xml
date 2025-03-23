@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C8F5CC"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 返回按鈕 -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/ic_back"
+            android:contentDescription="返回" />
+
+        <!-- 頭像列 -->
+        <LinearLayout
+            android:id="@+id/etProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/home_header_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_header_edit"
+                android:scaleType="centerInside" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Username"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:gravity="center" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_user_photo"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <!-- 基本健康資訊 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="基本健康資訊"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="身高 (公分)"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="體重 (公斤)"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="生日"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"/>
+
+        <!-- 血糖紀錄 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="每日血糖紀錄"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="偵測時間 (yyyy-MM-dd HH：mm：ss)"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="空腹血糖 (mg/dL)"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="餐後血糖 (mg/dL)"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"/>
+
+        <!-- 提示區塊 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/info_box_background"
+            android:padding="12dp"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/ic_warning" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="若您的血糖機使用的是歐式標準單位毫摩爾/升(mmol/L)，請使用以下公式換成美式單位毫克/分升 (mg/dL)\n毫克/分升 = 毫摩爾/升 * 18\nex: 3.0 毫摩爾/升 = 54 毫克/分升"
+                android:textColor="#000000"
+                android:textSize="20sp"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

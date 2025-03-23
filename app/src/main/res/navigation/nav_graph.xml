@@ -4,22 +4,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:startDestination="@id/nav_home">
 
+    <!-- 導覽列首頁-->
     <fragment
         android:id="@+id/nav_home"
         android:name="com.example.ahhapp.HomeFragment"
         android:label="首頁"
         />
-
+    <!--導覽列通知-->
     <fragment
         android:id="@+id/nav_notify"
         android:name="com.example.ahhapp.NotifyFragment"
         android:label="通知"
         />
-
+    <!--導覽列個人-->
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.ahhapp.InfoFragment"
         android:label="個人"
        />
-
+    <!--編輯健康資訊-->
+    <!--血壓-->
+    <fragment
+        android:id="@+id/editBloodPressureFragment"
+        android:name="com.example.ahhapp.EditBloodPressureFragment"
+        android:label="血壓資訊"
+        />
+    <!--血糖-->
+    <fragment
+        android:id="@+id/editBloodSugarFragment"
+        android:name="com.example.ahhapp.EditBloodSugarFragment"
+        android:label="血糖資訊"
+        />
 </navigation>
