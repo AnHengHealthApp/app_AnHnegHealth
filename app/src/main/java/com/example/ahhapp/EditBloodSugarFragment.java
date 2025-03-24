@@ -1,6 +1,7 @@
 package com.example.ahhapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,5 +39,18 @@ public class EditBloodSugarFragment extends Fragment {
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveUserInput(); // 離開畫面時儲存輸入
+    }
+
+    private void saveUserInput() {
+        // TODO: 之後串接 SQLite 或 API 時，把 EditText 中的資料存進資料庫
+
+        // 示意：目前用 log 確認執行時機
+        Log.d("AutoSave", "EditBloodSugarFragment 頁面離開，觸發自動儲存");
     }
 }

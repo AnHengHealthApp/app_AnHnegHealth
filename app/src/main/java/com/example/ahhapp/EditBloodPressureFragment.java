@@ -1,6 +1,7 @@
 package com.example.ahhapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,5 +43,16 @@ public class EditBloodPressureFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveUserInput(); // ⚠️ 頁面離開時自動儲存
+    }
+
+    private void saveUserInput() {
+        // TODO: 這裡之後串接資料庫時再實作
+        // 例如：從 EditText 取得輸入值並存進 SQLite 或傳給 API
     }
 }

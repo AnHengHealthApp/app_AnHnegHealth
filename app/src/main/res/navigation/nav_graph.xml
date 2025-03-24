@@ -35,4 +35,10 @@
         android:name="com.example.ahhapp.EditBloodSugarFragment"
         android:label="血糖資訊"
         />
+    <!--錯誤回報-->
+    <fragment
+        android:id="@+id/errorReportFragment"
+        android:name="com.example.ahhapp.ErrorReportFragment"
+        android:label="錯誤回報"
+        />
 </navigation>
