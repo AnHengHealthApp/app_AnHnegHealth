@@ -38,6 +38,13 @@ public class HomeFragment extends Fragment {
             navController.navigate(R.id.editBloodPressureFragment);
         });
 
+        //錯誤回報按鈕跳轉
+        Button btnErrorReport = view.findViewById(R.id.btnErrorReport);
+        btnErrorReport.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            navController.navigate(R.id.errorReportFragment);
+        });
+
         return view;// 傳回畫面
     }
 }

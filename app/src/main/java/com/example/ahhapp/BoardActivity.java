@@ -30,14 +30,18 @@ public class BoardActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         // 導覽頁監聽
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_notify) {
-                //  如果是「消息通知」按鈕，則不跳轉，只改變樣式
+                //通知不跳轉
                 changeNotificationButtonStyle(bottomNavigationView);
-                return true; // 阻止切換 Fragment
+                return true;
+            } else if (itemId == R.id.nav_home) {
+                //清除覆蓋的fragment,確保回到home
+                navController.popBackStack(R.id.nav_home, false);
+                return NavigationUI.onNavDestinationSelected(item, navController);
             } else {
-                //  其他按鈕（首頁、資訊）則正常切換 Fragment
+                //資訊正常跳轉
                 return NavigationUI.onNavDestinationSelected(item, navController);
             }
         });

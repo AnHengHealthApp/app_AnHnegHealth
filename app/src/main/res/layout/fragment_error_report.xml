@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C8F5CC">
+
+    <!-- 返回按鈕 -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_back"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
+
+    <!-- 頭像區塊 -->
+    <LinearLayout
+        android:id="@+id/etProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_below="@id/btnBack"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/home_header_bg"
+        android:padding="15dp">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_header_edit"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Username"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <ImageView
+            android:id="@+id/ivUserPhoto"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_user_photo"
+            android:scaleType="centerInside" />
+    </LinearLayout>
+
+    <!-- 問題描述區塊 -->
+    <LinearLayout
+        android:id="@+id/problemContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/etProfile"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="問題描述"
+            android:textSize="16sp"
+            android:textColor="#111111"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp" />
+
+        <EditText
+            android:id="@+id/etErrorMessage"
+            android:layout_width="match_parent"
+            android:layout_height="369dp"
+            android:background="@drawable/edittext_background"
+            android:gravity="top|start"
+            android:hint="問題描述(限100字)"
+            android:inputType="textMultiLine"
+            android:maxLength="100"
+            android:padding="12dp"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- 確認回報按鈕 -->
+    <Button
+        android:id="@+id/btnSubmitError"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="確認回報"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:background="@drawable/login_btn_bg"
+        android:layout_below="@id/problemContainer"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="30dp" />
+</RelativeLayout>
