@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import androidx.fragment.app.Fragment;
+import android.widget.Toast;
 
 public class ForgetPasswordFragment extends Fragment {
     @Override
@@ -31,6 +32,22 @@ public class ForgetPasswordFragment extends Fragment {
                     .remove(ForgetPasswordFragment.this)
                     .commit();
         });
+
+        // 發送郵件按鈕
+        Button btnSendEmail = view.findViewById(R.id.btn_send_email);
+        btnSendEmail.setOnClickListener(v -> {
+            // 顯示提示訊息（這裡只是模擬，未連接後端）
+            Toast.makeText(getContext(), "密碼重設郵件已發送", Toast.LENGTH_SHORT).show();
+
+            // 返回登入頁面
+            requireActivity().findViewById(R.id.fragment_container).setVisibility(View.GONE);
+            requireActivity().findViewById(R.id.login_section).setVisibility(View.VISIBLE);
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(ForgetPasswordFragment.this)
+                    .commit();
+        });
+
 
         return view;
     }
