@@ -45,6 +45,13 @@ public class HomeFragment extends Fragment {
             navController.navigate(R.id.errorReportFragment);
         });
 
+        //AI智能問答按鈕跳轉
+        Button btnAIQA = view.findViewById(R.id.btnAIQA);
+        btnAIQA.setOnClickListener(v-> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            navController.navigate(R.id.nav_ai_chat);
+        });
+
         return view;// 傳回畫面
     }
 }
