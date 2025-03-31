@@ -1,9 +1,11 @@
 package com.example.ahhapp;
 
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +27,19 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View view) {
                finish();
             } // 關閉當前 Activity
+        });
+
+        //註冊按鈕
+        Button btn_register = findViewById(R.id.btn_register);
+        btn_register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 顯示註冊成功的提示訊息
+                Toast.makeText(RegisterActivity.this, "註冊完成", Toast.LENGTH_SHORT).show();
+
+                // 關閉註冊頁，回到登入頁
+                finish();
+            }
         });
     }
 }
