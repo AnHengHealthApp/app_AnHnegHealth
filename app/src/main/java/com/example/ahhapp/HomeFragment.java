@@ -52,6 +52,13 @@ public class HomeFragment extends Fragment {
             navController.navigate(R.id.nav_ai_chat);
         });
 
+        //用藥提醒按鈕跳轉
+        Button btnMedicationReminder = view.findViewById(R.id.btnMedicationReminder);
+        btnMedicationReminder.setOnClickListener(v-> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            navController.navigate(R.id.nav_medication_reminder);
+        });
+
         return view;// 傳回畫面
     }
 }

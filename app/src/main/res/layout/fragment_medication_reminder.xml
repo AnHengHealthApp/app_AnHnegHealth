@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C8F5CC">
+
+    <!-- 返回按鈕 -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_back"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
+
+    <!-- 頭像區塊 -->
+    <LinearLayout
+        android:id="@+id/etProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@id/btnBack"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/home_header_bg"
+        android:padding="15dp">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_header_edit"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Username"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <ImageView
+            android:id="@+id/ivUserPhoto"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_user_photo"
+            android:scaleType="centerInside" />
+    </LinearLayout>
+
+    <!-- 內容區塊 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/etProfile"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 提醒輸入欄位 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/black"
+                android:text="新增藥物提醒"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etMedicineName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="藥物名稱"
+                android:background="@drawable/edittext_background"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <EditText
+                android:id="@+id/etMedicineTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="用藥時間(早上、中午、晚上)"
+                android:background="@drawable/edittext_background"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <EditText
+                android:id="@+id/etMedicineNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="用藥備註(飯前、飯後、睡前)"
+                android:background="@drawable/edittext_background"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <EditText
+                android:id="@+id/etReminderTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="提醒時間(HH:mm:ss)"
+                android:background="@drawable/edittext_background"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnAddReminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/login_btn_bg"
+                android:text="確定新增"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- 提醒藥物清單 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="提醒藥物清單"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_marginBottom="10dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvReminderList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:background="#E7F9E6"
+                android:overScrollMode="never" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

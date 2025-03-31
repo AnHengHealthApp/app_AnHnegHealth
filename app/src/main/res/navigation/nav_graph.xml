@@ -48,4 +48,11 @@
         android:name="com.example.ahhapp.AIChatFragment"
         android:label="AI聊天"
         />
+
+    <!--用藥提醒-->
+    <fragment
+        android:id="@+id/nav_medication_reminder"
+        android:name="com.example.ahhapp.MedicationReminderFragment"
+        android:label="用藥提醒"
+        />
 </navigation>
