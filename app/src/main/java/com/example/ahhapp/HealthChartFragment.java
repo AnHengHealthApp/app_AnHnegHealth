@@ -1,0 +1,168 @@
+package com.example.ahhapp;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class HealthChartFragment extends  Fragment{
+    private LineChart bloodPressureChart;
+    private LineChart bloodSugarChart;
+
+    //空建構子
+    public HealthChartFragment() {}
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState){
+
+        View view = inflater.inflate(R.layout.fragment_health_chart, container, false);
+
+        // 綁定頭像列並設點擊事件
+        view.findViewById(R.id.etProfile).setOnClickListener(v ->
+                com.example.ahhapp.ProfileUtils.showEditProfileDialog(requireContext()));
+
+        // 綁定返回鍵
+        ImageView btnBack = view.findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+
+        // 綁定圖表
+        bloodPressureChart = view.findViewById(R.id.lineChartBloodPressure);
+        bloodSugarChart = view.findViewById(R.id.lineChartBloodSugar);
+
+        setupBloodPressureChart();
+        setupBloodSugarChart();
+
+        return view;
+    }
+
+    //將血壓資料填入圖表
+    private void setupBloodPressureChart() {
+        List<Entry> systolicEntries = new ArrayList<>();
+        List<Entry> diastolicEntries = new ArrayList<>();
+        List<Entry> heartRateEntries = new ArrayList<>();
+
+        //假資料測試
+        systolicEntries.add(new Entry(0, 130));
+        systolicEntries.add(new Entry(1, 128));
+        systolicEntries.add(new Entry(2, 125));
+
+        diastolicEntries.add(new Entry(0, 80));
+        diastolicEntries.add(new Entry(1, 78));
+        diastolicEntries.add(new Entry(2, 82));
+
+        heartRateEntries.add(new Entry(0, 72));
+        heartRateEntries.add(new Entry(1, 70));
+        heartRateEntries.add(new Entry(2, 75));
+        LineDataSet set1 = new LineDataSet(systolicEntries, "收縮壓");
+        set1.setColor(Color.RED);
+        set1.setCircleColor(Color.RED);
+        set1.setLineWidth(4f); // 收縮壓
+        set1.setCircleRadius(6f);
+        set1.setValueTextSize(14f);
+        set1.setDrawValues(false);
+
+        LineDataSet set2 = new LineDataSet(diastolicEntries, "舒張壓");
+        set2.setColor(Color.BLUE);
+        set2.setCircleColor(Color.BLUE);
+        set2.setLineWidth(4f); // 舒張壓
+        set2.setCircleRadius(6f);
+        set2.setValueTextSize(14f);
+        set2.setDrawValues(false);
+
+        LineDataSet set3 = new LineDataSet(heartRateEntries, "心跳");
+        set3.setColor(Color.GREEN);
+        set3.setCircleColor(Color.GREEN);
+        set3.setLineWidth(4f); // 心跳
+        set3.setCircleRadius(6f);
+        set3.setValueTextSize(14f);
+        set3.setDrawValues(false);
+
+        LineData lineData = new LineData(set1, set2, set3);
+        bloodPressureChart.setData(lineData);
+        styleChart(bloodPressureChart);
+    }
+
+    //將血糖資料填入圖表
+    private void setupBloodSugarChart() {
+        List<Entry> fastingEntries = new ArrayList<>();
+        List<Entry> postMealEntries = new ArrayList<>();
+
+        // 加入假資料（最近幾天）
+        fastingEntries.add(new Entry(0, 90));
+        fastingEntries.add(new Entry(1, 88));
+        fastingEntries.add(new Entry(2, 92));
+
+        postMealEntries.add(new Entry(0, 140));
+        postMealEntries.add(new Entry(1, 125));
+        postMealEntries.add(new Entry(2, 130));
+
+        LineDataSet set1 = new LineDataSet(fastingEntries, "空腹血糖");
+        set1.setColor(Color.RED);
+        set1.setCircleColor(Color.RED);
+        set1.setLineWidth(4f); // 空腹
+        set1.setCircleRadius(6f);
+        set1.setValueTextSize(14f);
+        set1.setDrawValues(false);
+
+        LineDataSet set2 = new LineDataSet(postMealEntries, "餐後血糖");
+        set2.setColor(Color.MAGENTA);
+        set2.setCircleColor(Color.MAGENTA);
+        set2.setLineWidth(4f); // 餐後
+        set2.setCircleRadius(6f);
+        set2.setValueTextSize(14f);
+        set2.setDrawValues(false);
+
+        LineData lineData = new LineData(set1, set2);
+        bloodSugarChart.setData(lineData);
+        styleChart(bloodSugarChart);
+    }
+
+    //設定圖表樣式
+    private void styleChart(LineChart chart) {
+        chart.getDescription().setEnabled(false); // 不顯示描述
+        chart.setDrawGridBackground(false);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // X 軸在底部
+        xAxis.setDrawGridLines(false); // 不畫網格線
+        xAxis.setTextSize(18f); // X軸標籤文字
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setDrawGridLines(true); // 顯示左側網格線
+        leftAxis.setTextSize(18f); // Y軸標籤文字
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setEnabled(false); // 右側 Y 軸不要
+
+        Legend legend = chart.getLegend();
+        legend.setForm(Legend.LegendForm.LINE);
+        legend.setTextSize(20f); // 圖例文字
+
+
+
+        chart.invalidate(); // 刷新圖表
+    }
+}

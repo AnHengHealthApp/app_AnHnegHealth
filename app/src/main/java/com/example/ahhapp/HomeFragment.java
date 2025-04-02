@@ -59,6 +59,12 @@ public class HomeFragment extends Fragment {
             navController.navigate(R.id.nav_medication_reminder);
         });
 
+        //健康曲線圖按鈕跳轉
+        Button btnHealthChart = view.findViewById(R.id.btnHealthChart);
+        btnHealthChart.setOnClickListener(v-> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            navController.navigate(R.id.nav_health_chart);
+        });
         return view;// 傳回畫面
     }
 }

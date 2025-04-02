@@ -10,18 +10,21 @@
         android:name="com.example.ahhapp.HomeFragment"
         android:label="首頁"
         />
+
     <!--導覽列通知-->
     <fragment
         android:id="@+id/nav_notify"
         android:name="com.example.ahhapp.NotifyFragment"
         android:label="通知"
         />
+
     <!--導覽列個人-->
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.ahhapp.InfoFragment"
         android:label="個人"
        />
+
     <!--編輯健康資訊-->
     <!--血壓-->
     <fragment
@@ -35,6 +38,7 @@
         android:name="com.example.ahhapp.EditBloodSugarFragment"
         android:label="血糖資訊"
         />
+
     <!--錯誤回報-->
     <fragment
         android:id="@+id/errorReportFragment"
@@ -55,4 +59,12 @@
         android:name="com.example.ahhapp.MedicationReminderFragment"
         android:label="用藥提醒"
         />
+
+    <!--健康曲線圖-->
+    <fragment
+        android:id="@+id/nav_health_chart"
+        android:name="com.example.ahhapp.HealthChartFragment"
+        android:label="健康曲線圖"
+        />
+
 </navigation>
