@@ -1,11 +1,13 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.chat;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,9 +16,14 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ahhapp.adapter.ChatAdapter;
+import com.example.ahhapp.data.modle.ChatMessage;
+import com.example.ahhapp.R;
+import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
+
 import java.util.ArrayList;
 
-public class AIChatFragment extends  Fragment{
+public class AIChatFragment extends  Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
     private ArrayList<ChatMessage> messageList = new ArrayList<>();
     private ChatAdapter chatAdapter;
     @Nullable
@@ -27,9 +34,12 @@ public class AIChatFragment extends  Fragment{
 
         View view = inflater.inflate(R.layout.fragment_ai_chat, container, false);
 
-        // 頭像欄位點擊事件
-        view.findViewById(R.id.etProfile).setOnClickListener(v ->
-                ProfileUtils.showEditProfileDialog(requireContext()));
+        // 綁定頭像欄區塊並設定點擊事件
+        view.findViewById(R.id.etProfile).setOnClickListener(v -> {
+            EditProfileDialogFragment dialog = new EditProfileDialogFragment();
+            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
+            dialog.show(getParentFragmentManager(), "EditProfileDialog");
+        });
 
         // RecyclerView 初始化
         RecyclerView recyclerChat = view.findViewById(R.id.recyclerChat);
@@ -67,6 +77,11 @@ public class AIChatFragment extends  Fragment{
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         return view;
+    }
+
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
     }
 
 }

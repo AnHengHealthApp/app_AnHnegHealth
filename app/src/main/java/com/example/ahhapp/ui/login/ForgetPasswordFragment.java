@@ -1,4 +1,4 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.login;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import androidx.fragment.app.Fragment;
 import android.widget.Toast;
+
+import com.example.ahhapp.R;
 
 public class ForgetPasswordFragment extends Fragment {
     @Override

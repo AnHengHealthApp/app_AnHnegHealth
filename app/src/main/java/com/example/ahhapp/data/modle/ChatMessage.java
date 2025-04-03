@@ -1,4 +1,4 @@
-package com.example.ahhapp;
+package com.example.ahhapp.data.modle;
 
 public class ChatMessage {
     private String message;

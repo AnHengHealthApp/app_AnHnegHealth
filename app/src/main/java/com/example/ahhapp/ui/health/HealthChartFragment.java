@@ -1,18 +1,21 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.health;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.example.ahhapp.R;
+import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -25,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class HealthChartFragment extends  Fragment{
+public class HealthChartFragment extends  Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
     private LineChart bloodPressureChart;
     private LineChart bloodSugarChart;
 
@@ -41,8 +44,11 @@ public class HealthChartFragment extends  Fragment{
         View view = inflater.inflate(R.layout.fragment_health_chart, container, false);
 
         // 綁定頭像列並設點擊事件
-        view.findViewById(R.id.etProfile).setOnClickListener(v ->
-                com.example.ahhapp.ProfileUtils.showEditProfileDialog(requireContext()));
+        view.findViewById(R.id.etProfile).setOnClickListener(v -> {
+            EditProfileDialogFragment dialog = new EditProfileDialogFragment();
+            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
+            dialog.show(getParentFragmentManager(), "EditProfileDialog");
+        });
 
         // 綁定返回鍵
         ImageView btnBack = view.findViewById(R.id.btnBack);
@@ -56,6 +62,11 @@ public class HealthChartFragment extends  Fragment{
         setupBloodSugarChart();
 
         return view;
+    }
+
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
     }
 
     //將血壓資料填入圖表

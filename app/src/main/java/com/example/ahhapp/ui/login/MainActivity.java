@@ -1,4 +1,4 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ahhapp.ui.main.BoardActivity;
+import com.example.ahhapp.R;
+import com.example.ahhapp.ui.register.RegisterActivity;
 
 public class MainActivity extends AppCompatActivity {
     // 宣告兩個按鈕：登入與註冊

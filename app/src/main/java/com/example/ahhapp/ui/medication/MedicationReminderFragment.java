@@ -1,11 +1,11 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.medication;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Button;
 
@@ -16,14 +16,17 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ahhapp.adapter.MedicineReminderAdapter;
+import com.example.ahhapp.R;
+import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MedicationReminderFragment extends Fragment{
+public class MedicationReminderFragment extends Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
     private RecyclerView recyclerView;
     private MedicineReminderAdapter adapter;
     private List<String> medicineList;
-    private LinearLayout etProfile;
 
 
     // 空建構子
@@ -40,8 +43,11 @@ public class MedicationReminderFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_medication_reminder, container, false);
 
         //頭像按鈕邏輯
-        view.findViewById(R.id.etProfile).setOnClickListener(v ->
-                ProfileUtils.showEditProfileDialog(requireContext()));
+        view.findViewById(R.id.etProfile).setOnClickListener(v -> {
+            EditProfileDialogFragment dialog = new EditProfileDialogFragment();
+            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
+            dialog.show(getParentFragmentManager(), "EditProfileDialog");
+        });
 
         //綁定確定新增按鈕
         Button btnAddMedicine = view.findViewById(R.id.btnAddReminder);
@@ -66,5 +72,10 @@ public class MedicationReminderFragment extends Fragment{
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         return view;
+    }
+
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
     }
 }

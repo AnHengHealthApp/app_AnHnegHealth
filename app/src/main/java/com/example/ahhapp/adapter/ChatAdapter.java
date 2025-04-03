@@ -1,4 +1,4 @@
-package com.example.ahhapp;
+package com.example.ahhapp.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.ahhapp.data.modle.ChatMessage;
+import com.example.ahhapp.R;
 
 import java.util.ArrayList;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

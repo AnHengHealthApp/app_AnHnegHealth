@@ -1,4 +1,4 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.register;
 
 
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ahhapp.R;
 
 public class RegisterActivity extends AppCompatActivity {
     // 宣告返回按鈕（圖示）

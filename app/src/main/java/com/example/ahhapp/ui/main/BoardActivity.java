@@ -1,6 +1,8 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.main;
 
 import android.os.Bundle;
+
+import com.example.ahhapp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;

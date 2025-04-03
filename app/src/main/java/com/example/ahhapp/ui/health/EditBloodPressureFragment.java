@@ -1,20 +1,24 @@
-package com.example.ahhapp;
+package com.example.ahhapp.ui.health;
 
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-public class EditBloodPressureFragment extends Fragment {
+import com.example.ahhapp.R;
+import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
+
+public class EditBloodPressureFragment extends Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
     public EditBloodPressureFragment(){}
     private LinearLayout etProfile;
     @Nullable
@@ -25,9 +29,12 @@ public class EditBloodPressureFragment extends Fragment {
         // 載入對應的畫面 XML
         View view = inflater.inflate(R.layout.fragment_edit_blood_pressure, container, false);
 
-        // 上方個人資訊列
-        etProfile = view.findViewById(R.id.etProfile);
-        etProfile.setOnClickListener(v -> ProfileUtils.showEditProfileDialog(requireContext()));
+        // 綁定頭像欄區塊並設定點擊事件
+        view.findViewById(R.id.etProfile).setOnClickListener(v -> {
+            EditProfileDialogFragment dialog = new EditProfileDialogFragment();
+            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
+            dialog.show(getParentFragmentManager(), "EditProfileDialog");
+        });
 
         // 綁定返回按鈕
         ImageView btnBack = view.findViewById(R.id.btnBack);
@@ -43,6 +50,10 @@ public class EditBloodPressureFragment extends Fragment {
         });
 
         return view;
+    }
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
     }
 
     @Override

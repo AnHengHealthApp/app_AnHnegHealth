@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#C8F5CC"
-    tools:context=".MainActivity">
+    tools:context=".ui.login.MainActivity">
 
     <!-- 登入畫面整體包在 LinearLayout 中 -->
     <LinearLayout
