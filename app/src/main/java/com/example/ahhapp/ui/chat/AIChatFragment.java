@@ -47,16 +47,6 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
         chatAdapter = new ChatAdapter(getContext(), messageList);
         recyclerChat.setAdapter(chatAdapter);
 
-        // 假訊息測試
-        messageList.add(new ChatMessage("我今天血壓比較高要怎麼辦？", true));
-        messageList.add(new ChatMessage("最近天氣冷，血壓偏高是正常的，可以多觀察情緒。", false));
-        messageList.add(new ChatMessage("我今天血壓比較高要怎麼辦？", true));
-        messageList.add(new ChatMessage("最近天氣冷，血壓偏高是正常的，可以多觀察情緒。", false));
-        messageList.add(new ChatMessage("我今天血壓比較高要怎麼辦？", true));
-        messageList.add(new ChatMessage("最近天氣冷，血壓偏高是正常的，可以多觀察情緒。", false));
-        messageList.add(new ChatMessage("我今天血壓比較高要怎麼辦？", true));
-        messageList.add(new ChatMessage("最近天氣冷，血壓偏高是正常的，可以多觀察情緒。", false));
-        chatAdapter.notifyDataSetChanged();
 
         // 發送訊息按鈕
         EditText etMessage = view.findViewById(R.id.etMessage);
@@ -68,7 +58,13 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
                 chatAdapter.notifyItemInserted(messageList.size() - 1);
                 recyclerChat.scrollToPosition(messageList.size() - 1);
                 etMessage.setText("");
-                // TODO: 等待串接 API 回覆 AI 回應訊息
+
+                // 模擬的AI回應
+                recyclerChat.postDelayed(() -> {
+                    messageList.add(new ChatMessage("我有什麼能夠幫到您的嗎?", false)); // 假AI回應
+                    chatAdapter.notifyItemInserted(messageList.size() - 1);
+                    recyclerChat.scrollToPosition(messageList.size() - 1);
+                }, 500); // 模擬延遲 800 毫秒
             }
         });
 
