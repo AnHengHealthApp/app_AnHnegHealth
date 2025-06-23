@@ -49,7 +49,7 @@
         tools:ignore="HardcodedText,RtlHardcoded" />
 
     <EditText
-        android:id="@+id/et_account"
+        android:id="@+id/et_username"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
@@ -71,7 +71,7 @@
         tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
 
     <EditText
-        android:id="@+id/et_username"
+        android:id="@+id/et_display_name"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
