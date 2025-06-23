@@ -5,12 +5,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.EditText;
+import android.util.Log;
+import android.widget.Toast;
+import org.json.JSONObject;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ahhapp.ui.main.BoardActivity;
 import com.example.ahhapp.R;
 import com.example.ahhapp.ui.register.RegisterActivity;
+import com.example.ahhapp.data.modle.LoginRequest;
+import com.example.ahhapp.data.modle.LoginResponse;
+import com.example.ahhapp.network.ApiService;
+import com.example.ahhapp.network.RetrofitClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     // 宣告兩個按鈕：登入與註冊
@@ -29,16 +41,70 @@ public class MainActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btn_register);
         tvForgotPassword = findViewById(R.id.tv_forgot_password);
 
-        // 當使用者點擊「登入」按鈕時
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            // 跳轉到主畫面 BoardActivity（通常是登入後的首頁）
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, BoardActivity.class);
-                startActivity(intent);
-//                finish();
+                // 取得使用者輸入的帳號和密碼（EditText）
+                EditText etUsername = findViewById(R.id.et_account);
+                EditText etPassword = findViewById(R.id.et_password);
+
+                String username = etUsername.getText().toString().trim();
+                String password = etPassword.getText().toString().trim();
+
+                // 將使用者輸入資料包成 LoginRequest 物件
+                LoginRequest request = new LoginRequest(username, password);
+
+                // 建立 API 呼叫物件
+                ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+                Call<LoginResponse> call = apiService.login(request);
+
+                // 呼叫 login API（非同步執行）
+                call.enqueue(new Callback<LoginResponse>() {
+
+                    // 如果伺服器有回應（不管成功或失敗都會進來這裡）
+                    @Override
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                        if (response.isSuccessful()) {
+                            // 登入成功，從回應中取得 JWT token
+                            String token = response.body().getToken();
+                            Log.d("Login", "登入成功，Token: " + token);
+
+                            Toast.makeText(MainActivity.this, "登入成功", Toast.LENGTH_SHORT).show();
+
+                            // 登入成功後跳轉首頁（BoardActivity）
+                            Intent intent = new Intent(MainActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            finish(); // 結束登入頁
+                        } else {
+                            try {
+                                // 解析錯誤訊息 JSON
+                                String errorBody = response.errorBody().string();
+
+                                // 將錯誤 JSON 轉成 JSONObject
+                                JSONObject jsonObject = new JSONObject(errorBody);
+                                String errorMessage = jsonObject.getJSONObject("error").getString("message");
+
+                                // 顯示錯誤訊息給使用者
+                                Toast.makeText(MainActivity.this, "登入失敗：" + errorMessage, Toast.LENGTH_SHORT).show();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                // fallback 如果解析失敗就顯示狀態碼
+                                Toast.makeText(MainActivity.this, "登入失敗：" + response.code(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    // 如果伺服器完全沒回應（網路錯誤、連不上）
+                    @Override
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "錯誤：" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
+
+
 
         // 當使用者點擊「註冊」按鈕時
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -65,49 +131,4 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         });
     }
-
-
-    /*private ImageButton btnHom
-    e, btnNotify, btnProfile;
-    private FragmentManager fragmentManager;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        btnHome = findViewById(R.id.btnHome);
-        btnNotify = findViewById(R.id.btnNotify);
-        btnProfile = findViewById(R.id.btnProfile);
-
-        fragmentManager = getSupportFragmentManager();
-
-
-        btnHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnNotify.setSelected(false);
-                btnProfile.setSelected(false);
-                btnHome.setSelected(true);
-            }
-        });
-
-        btnNotify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnNotify.setSelected(true);
-                btnProfile.setSelected(false);
-                btnHome.setSelected(false);
-            }
-        });
-
-        btnProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnNotify.setSelected(false);
-                btnProfile.setSelected(true);
-                btnHome.setSelected(false);
-            }
-        });
-    }*/
 }
