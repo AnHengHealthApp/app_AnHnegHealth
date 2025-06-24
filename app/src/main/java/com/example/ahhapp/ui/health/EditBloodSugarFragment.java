@@ -98,10 +98,27 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
         EditText etBirthday = rootView.findViewById(R.id.etBirthday);
         EditText etGender = rootView.findViewById(R.id.etGender);
 
-        int height = Integer.parseInt(etHeight.getText().toString().trim());
-        int weight = Integer.parseInt(etWeight.getText().toString().trim());
+        //將輸入資料轉為字串做檢查(防crash)
+        String heightStr = etHeight.getText().toString().trim();
+        String weightStr = etWeight.getText().toString().trim();
         String birthday = etBirthday.getText().toString().trim();
-        int gender = Integer.parseInt(etGender.getText().toString().trim());
+        String genderStr = etGender.getText().toString().trim();
+
+        if (heightStr.isEmpty() || weightStr.isEmpty() || birthday.isEmpty() || genderStr.isEmpty()) {
+            Toast.makeText(getContext(), "請完整填寫基本健康資料", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //將資料轉回Int
+        int height, weight, gender;
+        try {
+            height = Integer.parseInt(heightStr);
+            weight = Integer.parseInt(weightStr);
+            gender = Integer.parseInt(genderStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "請輸入有效數字（身高、體重、性別）", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String token = prefs.getString("token", null);

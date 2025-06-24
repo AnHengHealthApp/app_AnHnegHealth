@@ -87,11 +87,28 @@ public class EditBloodPressureFragment extends Fragment implements EditProfileDi
         EditText etSys = rootView.findViewById(R.id.etSystolic);
         EditText etDia = rootView.findViewById(R.id.etDiastolic);
 
-        // 將使用者輸入轉為字串/數字
-        String date = etDate.getText().toString().trim(); // yyyy-MM-dd HH:mm:ss
-        int heart = Integer.parseInt(etHeart.getText().toString().trim());
-        int sys = Integer.parseInt(etSys.getText().toString().trim());
-        int dia = Integer.parseInt(etDia.getText().toString().trim());
+        //先以字串檢查是否有缺失值(防crash)
+        String date = etDate.getText().toString().trim();
+        String heartStr = etHeart.getText().toString().trim();
+        String sysStr = etSys.getText().toString().trim();
+        String diaStr = etDia.getText().toString().trim();
+
+        // 空值檢查
+        if (date.isEmpty() || heartStr.isEmpty() || sysStr.isEmpty() || diaStr.isEmpty()) {
+            Toast.makeText(getContext(), "請完整填寫血壓資料", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //將資料型態轉回Int
+        int heart, sys, dia;
+        try {
+            heart = Integer.parseInt(heartStr);
+            sys = Integer.parseInt(sysStr);
+            dia = Integer.parseInt(diaStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "請輸入有效數字", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // 取得儲存在本地的 JWT Token
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
@@ -144,11 +161,27 @@ public class EditBloodPressureFragment extends Fragment implements EditProfileDi
         EditText etBirthday = rootView.findViewById(R.id.etBirthday);
         EditText etGender = rootView.findViewById(R.id.etGender);
 
-        // 取得輸入值
-        int height = Integer.parseInt(etHeight.getText().toString().trim());
-        int weight = Integer.parseInt(etWeight.getText().toString().trim());
+        //將輸入資料轉為字串做檢查(防crash)
+        String heightStr = etHeight.getText().toString().trim();
+        String weightStr = etWeight.getText().toString().trim();
         String birthday = etBirthday.getText().toString().trim();
-        int gender = Integer.parseInt(etGender.getText().toString().trim());
+        String genderStr = etGender.getText().toString().trim();
+
+        if (heightStr.isEmpty() || weightStr.isEmpty() || birthday.isEmpty() || genderStr.isEmpty()) {
+            Toast.makeText(getContext(), "請完整填寫基本健康資料", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //將資料轉回Int
+        int height, weight, gender;
+        try {
+            height = Integer.parseInt(heightStr);
+            weight = Integer.parseInt(weightStr);
+            gender = Integer.parseInt(genderStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "請輸入有效數字（身高、體重、性別）", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // 取得 token
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
