@@ -87,7 +87,7 @@
             android:id="@+id/etBirthday"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="生日"
+            android:hint="生日(yyyy-mm-dd)"
             android:background="@drawable/edittext_background"
             android:padding="12dp"
             android:layout_marginBottom="10dp" />
@@ -96,10 +96,19 @@
             android:id="@+id/etGender"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="性別"
+            android:hint="性別(男:0,女:1,其他:2)"
             android:background="@drawable/edittext_background"
             android:padding="12dp"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="5dp" />
+
+        <Button
+            android:id="@+id/btnSubmitinfo"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:text="儲存"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/login_btn_bg"
+            android:textColor="@color/black"/>
 
         <!-- 血糖紀錄 -->
         <TextView
@@ -137,6 +146,15 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/edittext_background"
             android:padding="12dp"/>
+
+        <Button
+            android:id="@+id/btnSubmitSuger"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:text="儲存"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/login_btn_bg"
+            android:textColor="@color/black"/>
 
         <!-- 提示區塊 -->
         <LinearLayout

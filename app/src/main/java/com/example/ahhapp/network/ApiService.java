@@ -8,6 +8,8 @@ import com.example.ahhapp.data.modle.VitalsRequest;
 import com.example.ahhapp.data.modle.VitalsResponse;
 import com.example.ahhapp.data.modle.UpdateProfileRequest;
 import com.example.ahhapp.data.modle.UpdateProfileResponse;
+import com.example.ahhapp.data.modle.BloodSugarRequest;
+import com.example.ahhapp.data.modle.BloodSugarResponse;
 import retrofit2.Call;
 
 import retrofit2.http.Body;
@@ -31,6 +33,10 @@ public interface ApiService {
     @POST("health/vitals")
     // 傳送血壓資料時，請求主體是 VitalsRequest，Header 帶 Authorization token
     Call<VitalsResponse> addVitals(@Body VitalsRequest request, @Header("Authorization") String authHeader);
+
+    //edit blood sugar
+    @POST("/api/v1/health/bloodSugar")
+    Call<BloodSugarResponse> addBloodSugar(@Body BloodSugarRequest request, @Header("Authorization") String token);
 
     //更新基本資料
     @POST("/api/v1/health/basic")

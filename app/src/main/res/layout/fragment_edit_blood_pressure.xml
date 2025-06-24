@@ -84,7 +84,7 @@
         android:id="@+id/etBirthday"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:hint="生日"
+        android:hint="生日(yyyy-mm-dd)"
         android:background="@drawable/edittext_background"
         android:padding="12dp"
         android:layout_marginBottom="5dp" />
@@ -93,7 +93,7 @@
         android:id="@+id/etGender"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:hint="性別"
+        android:hint="性別(男:0,女:1,其他:2)"
         android:background="@drawable/edittext_background"
         android:padding="12dp"
         android:layout_marginBottom="5dp" />
