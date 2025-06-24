@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.util.Log;
 import android.widget.Toast;
 import org.json.JSONObject;
+import android.content.SharedPreferences;
+import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -67,14 +69,16 @@ public class MainActivity extends AppCompatActivity {
                         if (response.isSuccessful()) {
                             // 登入成功，從回應中取得 JWT token
                             String token = response.body().getToken();
+                            SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                            prefs.edit().putString("token", token).apply();
                             Log.d("Login", "登入成功，Token: " + token);
 
                             Toast.makeText(MainActivity.this, "登入成功", Toast.LENGTH_SHORT).show();
 
-                            // 登入成功後跳轉首頁（BoardActivity）
+                            // 登入成功後跳轉首頁
                             Intent intent = new Intent(MainActivity.this, BoardActivity.class);
                             startActivity(intent);
-                            finish(); // 結束登入頁
+                            finish();
                         } else {
                             try {
                                 // 解析錯誤訊息 JSON
