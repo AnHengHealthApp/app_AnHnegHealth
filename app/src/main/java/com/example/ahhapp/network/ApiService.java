@@ -10,6 +10,9 @@ import com.example.ahhapp.data.modle.UpdateProfileRequest;
 import com.example.ahhapp.data.modle.UpdateProfileResponse;
 import com.example.ahhapp.data.modle.BloodSugarRequest;
 import com.example.ahhapp.data.modle.BloodSugarResponse;
+import com.example.ahhapp.data.modle.ForgotPasswordRequest;
+import com.google.gson.JsonObject;
+
 import retrofit2.Call;
 
 import retrofit2.http.Body;
@@ -40,9 +43,11 @@ public interface ApiService {
 
     //更新基本資料
     @POST("/api/v1/health/basic")
-    Call<UpdateProfileResponse> updateProfile(
-            @Body UpdateProfileRequest request,
-            @Header("Authorization") String token
-    );
+    Call<UpdateProfileResponse> updateProfile(@Body UpdateProfileRequest request, @Header("Authorization") String token);
+
+    //忘記密碼
+    @POST("user/forgot-password-mail")
+    Call<JsonObject> sendForgotPasswordEmail(@Body ForgotPasswordRequest request);
+
     // @Body 表示這個參數會變成 JSON 傳到伺服器
 }
