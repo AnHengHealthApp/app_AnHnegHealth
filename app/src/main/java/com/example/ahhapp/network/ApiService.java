@@ -11,6 +11,7 @@ import com.example.ahhapp.data.modle.UpdateProfileResponse;
 import com.example.ahhapp.data.modle.BloodSugarRequest;
 import com.example.ahhapp.data.modle.BloodSugarResponse;
 import com.example.ahhapp.data.modle.ForgotPasswordRequest;
+import com.example.ahhapp.data.modle.IssueReportRequest;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -49,5 +50,8 @@ public interface ApiService {
     @POST("user/forgot-password-mail")
     Call<JsonObject> sendForgotPasswordEmail(@Body ForgotPasswordRequest request);
 
+    //問題回報
+    @POST("report/issue")
+    Call<JsonObject> submitIssueReport( @Header("Authorization") String token, @Body IssueReportRequest request);
     // @Body 表示這個參數會變成 JSON 傳到伺服器
 }
