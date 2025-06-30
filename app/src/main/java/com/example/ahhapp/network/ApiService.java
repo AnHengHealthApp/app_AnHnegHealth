@@ -12,14 +12,23 @@ import com.example.ahhapp.data.modle.BloodSugarRequest;
 import com.example.ahhapp.data.modle.BloodSugarResponse;
 import com.example.ahhapp.data.modle.ForgotPasswordRequest;
 import com.example.ahhapp.data.modle.IssueReportRequest;
+import com.example.ahhapp.data.modle.MedicationReminder;
+import com.example.ahhapp.data.modle.MedicationReminderRequest;
+import com.example.ahhapp.data.modle.MedicationReminderResponse;
 import com.google.gson.JsonObject;
+
+import java.util.List;
 
 import retrofit2.Call;
 
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Header;
+import retrofit2.http.Path;
+
 
 // Retrofit API 的定義介面
 public interface ApiService {
@@ -53,5 +62,18 @@ public interface ApiService {
     //問題回報
     @POST("report/issue")
     Call<JsonObject> submitIssueReport( @Header("Authorization") String token, @Body IssueReportRequest request);
+
+    //取得用藥提醒
+    @GET("health/medication")
+    Call<MedicationReminderResponse> getAllMedication(@Header("Authorization") String token);
+
+    //新增用藥提醒
+    @POST("health/medication")
+    Call<JsonObject> addMedication(@Header("Authorization") String token, @Body MedicationReminderRequest request);
+
+    //刪除用藥提醒
+    @DELETE("health/medication/{id}")
+    Call<JsonObject> deleteMedication(@Path("id") int id, @Header("Authorization") String token);
+
     // @Body 表示這個參數會變成 JSON 傳到伺服器
 }

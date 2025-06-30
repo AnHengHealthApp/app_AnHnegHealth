@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+
 public class MyApplication extends Application {
 
     @Override
@@ -12,18 +13,22 @@ public class MyApplication extends Application {
         createNotificationChannel();
     }
 
+    /**
+     * 建立健康提醒通知頻道（供用藥提醒、血壓異常等使用）
+     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    "health_channel",
-                    "健康提醒",
-                    NotificationManager.IMPORTANCE_HIGH
-            );
-            channel.setDescription("用於血壓、血糖異常與用藥提醒");
+            String channelId = "health_channel";
+            CharSequence name = "健康提醒頻道";
+            String description = "顯示用藥提醒與健康通知";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
 
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(channel);
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
             }
         }
     }

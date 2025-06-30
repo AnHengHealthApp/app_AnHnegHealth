@@ -40,8 +40,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class EditBloodSugarFragment extends Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
+
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 1001;
 
     public EditBloodSugarFragment() {
         // 空建構子（必要）
@@ -55,53 +56,41 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        // 載入 XML 畫面
         View view = inflater.inflate(R.layout.fragment_edit_blood_sugar, container, false);
 
-        // 綁定頭像欄區塊並設定點擊事件
         view.findViewById(R.id.etProfile).setOnClickListener(v -> {
             EditProfileDialogFragment dialog = new EditProfileDialogFragment();
-            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
+            dialog.setListener(this);
             dialog.show(getParentFragmentManager(), "EditProfileDialog");
         });
 
-        // 綁定返回按鈕，點擊時返回上一頁
         ImageView btnBack = view.findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
-
-        //點擊儲存(血糖)
         view.findViewById(R.id.btnSubmitSuger).setOnClickListener(v -> {
             EditText etEmpty = view.findViewById(R.id.etEmptyBloodSuger);
             EditText etFull = view.findViewById(R.id.etFullBloodSuger);
-
             String emptyText = etEmpty.getText().toString().trim();
             String fullText = etFull.getText().toString().trim();
 
-            // 依據使用者填寫的欄位來上傳
-            if (!emptyText.isEmpty()) sendBloodSugar(view, 0); // 空腹
-            if (!fullText.isEmpty()) sendBloodSugar(view, 2);  // 餐後
-
+            if (!emptyText.isEmpty()) sendBloodSugar(view, 0);
+            if (!fullText.isEmpty()) sendBloodSugar(view, 2);
             if (emptyText.isEmpty() && fullText.isEmpty()) {
                 Toast.makeText(getContext(), "請至少填寫一項血糖數值", Toast.LENGTH_SHORT).show();
             }
         });
 
-        //點及儲存(基本健康資料)
         view.findViewById(R.id.btnSubmitinfo).setOnClickListener(v -> updateProfileInfo(view));
 
         return view;
     }
 
-
-    //上傳基本健康資料
     private void updateProfileInfo(View rootView) {
         EditText etHeight = rootView.findViewById(R.id.etHeight);
         EditText etWeight = rootView.findViewById(R.id.etWeight);
         EditText etBirthday = rootView.findViewById(R.id.etBirthday);
         EditText etGender = rootView.findViewById(R.id.etGender);
 
-        //將輸入資料轉為字串做檢查(防crash)
         String heightStr = etHeight.getText().toString().trim();
         String weightStr = etWeight.getText().toString().trim();
         String birthday = etBirthday.getText().toString().trim();
@@ -112,7 +101,6 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
             return;
         }
 
-        //將資料轉回Int
         int height, weight, gender;
         try {
             height = Integer.parseInt(heightStr);
@@ -141,15 +129,11 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
                     Toast.makeText(getContext(), "基本資料更新成功", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        // 從伺服器的錯誤 body 擷取錯誤訊息
                         String errorBody = response.errorBody().string();
-
-                        // 使用 Gson 解析錯誤 JSON
                         Gson gson = new Gson();
                         JsonObject jsonObject = gson.fromJson(errorBody, JsonObject.class);
                         JsonObject errorObj = jsonObject.getAsJsonObject("error");
                         String errorMessage = errorObj.get("message").getAsString();
-
                         Toast.makeText(getContext(), "更新失敗：" + errorMessage, Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "更新失敗，無法解析錯誤訊息", Toast.LENGTH_SHORT).show();
@@ -164,7 +148,6 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
         });
     }
 
-    //上傳血糖資料 0= 空腹 1 = 餐後
     private void sendBloodSugar(View rootView, int context) {
         EditText etDate = rootView.findViewById(R.id.etDate);
         EditText etEmpty = rootView.findViewById(R.id.etEmptyBloodSuger);
@@ -186,11 +169,10 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
             return;
         }
 
-        // 血糖異常通知
         if (context == 0 && sugar > 130) {
-            showHealthNotification(getContext(), "空腹血糖偏高", "您的空腹血糖已超過 130，請注意飲食與作息");
+            showHealthNotification("空腹血糖偏高", "您的空腹血糖已超過 130，請注意飲食與作息");
         } else if (context == 2 && sugar > 180) {
-            showHealthNotification(getContext(), "餐後血糖偏高", "餐後血糖高於 180，建議監測與調整飲食");
+            showHealthNotification("餐後血糖偏高", "餐後血糖高於 180，建議監測與調整飲食");
         }
 
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
@@ -225,31 +207,37 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
             }
         });
     }
-    @Override
-    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
-        Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
-    }
 
-
-    //異常資料提醒
-    private void showHealthNotification(Context context, String title, String message) {
+    private void checkNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS)
                         != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(),
-                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
-            return;
+                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICATION_PERMISSION);
         }
+    }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "health_channel")
+    private void showHealthNotification(String title, String message) {
+        checkNotificationPermissionIfNeeded();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "health_channel")
                 .setSmallIcon(R.drawable.ic_warning)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
+        try {
+            notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "缺少通知權限，無法顯示提醒", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料已回傳！", Toast.LENGTH_SHORT).show();
     }
 
     @Override

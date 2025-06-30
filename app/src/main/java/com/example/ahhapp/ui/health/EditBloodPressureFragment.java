@@ -3,7 +3,9 @@ package com.example.ahhapp.ui.health;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +15,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -32,9 +35,6 @@ import com.example.ahhapp.network.RetrofitClient;
 import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import android.content.pm.PackageManager;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,8 +42,9 @@ import retrofit2.Response;
 
 
 public class EditBloodPressureFragment extends Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
-    public EditBloodPressureFragment() {
-    }
+
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 1001;
+    public EditBloodPressureFragment() {}
 
     private LinearLayout etProfile;
 
@@ -115,12 +116,9 @@ public class EditBloodPressureFragment extends Fragment implements EditProfileDi
             return;
         }
         // 異常判斷並發送通知
-        if (sys > 140) {
-            showHealthNotification(getContext(), "收縮壓偏高", "您的收縮壓已超過 140 mmHg，請注意健康狀況");
-        }
-        if (dia > 90) {
-            showHealthNotification(getContext(), "舒張壓偏高", "舒張壓高於 90 mmHg，請注意健康狀況");
-        }
+        if (sys > 140) showHealthNotification(getContext(), "收縮壓偏高", "您的收縮壓已超過 140 mmHg，請注意健康狀況");
+        if (dia > 90) showHealthNotification(getContext(), "舒張壓偏高", "舒張壓高於 90 mmHg，請注意健康狀況");
+
         // 取得儲存在本地的 JWT Token
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String token = prefs.getString("token", null);
@@ -237,44 +235,34 @@ public class EditBloodPressureFragment extends Fragment implements EditProfileDi
             }
         });
     }
-
-    @Override
-    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
-        Toast.makeText(getContext(), "資料已回傳！", Toast.LENGTH_SHORT).show();
-    }
-
     //異常資料提醒
     private void showHealthNotification(Context context, String title, String message) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(requireActivity(),
-                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
-                return;
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICATION_PERMISSION);
+            return;
         }
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "health_channel")
-                .setSmallIcon(R.drawable.ic_warning) // 請使用你自己的圖示
+                .setSmallIcon(R.drawable.ic_warning)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.notify((int) System.currentTimeMillis(), builder.build()); // 保證通知不重複
+        try {
+            notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "缺少通知權限，無法顯示提醒", Toast.LENGTH_SHORT).show();
+        }
     }
 
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1001) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "已允許通知權限", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "未授權通知，將無法接收提醒", Toast.LENGTH_SHORT).show();
-            }
-        }
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料已回傳！", Toast.LENGTH_SHORT).show();
     }
 
     @Override

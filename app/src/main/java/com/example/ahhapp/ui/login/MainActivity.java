@@ -1,6 +1,8 @@
 package com.example.ahhapp.ui.login;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,11 +10,14 @@ import android.widget.TextView;
 import android.widget.EditText;
 import android.util.Log;
 import android.widget.Toast;
-import org.json.JSONObject;
+import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.ahhapp.ui.main.BoardActivity;
 import com.example.ahhapp.R;
@@ -21,6 +26,8 @@ import com.example.ahhapp.data.modle.LoginRequest;
 import com.example.ahhapp.data.modle.LoginResponse;
 import com.example.ahhapp.network.ApiService;
 import com.example.ahhapp.network.RetrofitClient;
+
+import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogin,btnRegister;
     // 宣告忘記密碼
     private TextView tvForgotPassword;
+
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 1001;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,8 +126,6 @@ public class MainActivity extends AppCompatActivity {
                 // 跳轉到註冊畫面 RegisterActivity
                 Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                 startActivity(intent);
-
-//                finish();
             }
         });
 
@@ -134,5 +141,31 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container, new ForgetPasswordFragment())
                     .commit();
         });
+    }
+
+    // Android 13 通知權限檢查
+    private void checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        NOTIFICATION_PERMISSION_REQUEST);
+            }
+        }
+    }
+
+    // 處理使用者點選結果
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "已授權通知權限", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "未授權通知，提醒功能可能無法運作", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

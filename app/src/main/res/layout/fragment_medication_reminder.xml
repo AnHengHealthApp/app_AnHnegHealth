@@ -111,7 +111,7 @@
                 android:id="@+id/etReminderTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="提醒時間(HH:mm:ss)"
+                android:hint="提醒時間(HH:mm)"
                 android:background="@drawable/edittext_background"
                 android:padding="10dp"
                 android:layout_marginBottom="10dp" />

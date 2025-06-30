@@ -16,18 +16,38 @@
         android:src="@drawable/ic_pills"
         android:contentDescription="藥品圖示" />
 
-    <!-- 藥物名稱 -->
-    <TextView
-        android:id="@+id/tvMedicineName"
+    <!-- 資訊欄 -->
+    <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="藥名 (說明)"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:textColor="#000000" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvMedicineName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="藥名"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvMedicineTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="用藥時間"
+            android:textSize="14sp"
+            android:textColor="#333333" />
+
+        <TextView
+            android:id="@+id/tvReminderTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="提醒時間"
+            android:textSize="14sp"
+            android:textColor="#333333" />
+    </LinearLayout>
 
     <!-- 刪除按鈕 -->
     <ImageView
