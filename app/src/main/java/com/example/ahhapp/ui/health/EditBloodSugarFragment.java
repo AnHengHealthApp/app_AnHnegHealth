@@ -1,35 +1,38 @@
 package com.example.ahhapp.ui.health;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.widget.EditText;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.ahhapp.R;
-import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
-import com.example.ahhapp.network.ApiService;
-import com.example.ahhapp.network.RetrofitClient;
-import com.example.ahhapp.data.modle.UpdateProfileRequest;
-import com.example.ahhapp.data.modle.UpdateProfileResponse;
 import com.example.ahhapp.data.modle.BloodSugarRequest;
 import com.example.ahhapp.data.modle.BloodSugarResponse;
-
+import com.example.ahhapp.data.modle.UpdateProfileRequest;
+import com.example.ahhapp.data.modle.UpdateProfileResponse;
+import com.example.ahhapp.network.ApiService;
+import com.example.ahhapp.network.RetrofitClient;
+import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -183,6 +186,13 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
             return;
         }
 
+        // 血糖異常通知
+        if (context == 0 && sugar > 130) {
+            showHealthNotification(getContext(), "空腹血糖偏高", "您的空腹血糖已超過 130，請注意飲食與作息");
+        } else if (context == 2 && sugar > 180) {
+            showHealthNotification(getContext(), "餐後血糖偏高", "餐後血糖高於 180，建議監測與調整飲食");
+        }
+
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String token = prefs.getString("token", null);
         if (token == null) {
@@ -218,6 +228,28 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
     @Override
     public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
         Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
+    }
+
+
+    //異常資料提醒
+    private void showHealthNotification(Context context, String title, String message) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
+            return;
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "health_channel")
+                .setSmallIcon(R.drawable.ic_warning)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
 
     @Override
