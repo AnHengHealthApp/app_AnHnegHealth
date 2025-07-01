@@ -93,7 +93,7 @@
                     android:id="@+id/tvHeight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="身高: 170 cm"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -101,7 +101,7 @@
                     android:id="@+id/tvWeight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="體重: 65 kg"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -109,7 +109,7 @@
                     android:id="@+id/tvAge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="年齡: 25 歲"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -118,7 +118,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="性別: 男"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -136,7 +136,7 @@
                     android:id="@+id/tvAvgHeartRate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="本週平均心跳: 72 下/分鐘"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -144,7 +144,7 @@
                     android:id="@+id/tvAvgSystolic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="本週平均收縮壓: 120 mmHg"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -152,7 +152,7 @@
                     android:id="@+id/tvAvgDiastolic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="本週平均舒張壓: 80 mmHg"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -161,7 +161,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="本週最大血壓差: 40 mmHg"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -179,7 +179,7 @@
                     android:id="@+id/tvAvgFastingGlucose"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="本週平均空腹血糖: 90 mg/dL"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -187,7 +187,7 @@
                     android:id="@+id/tvAvgPostprandialGlucose"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="本週平均餐後血糖: 110 mg/dL"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
@@ -195,7 +195,7 @@
                     android:id="@+id/tvMaxGlucoseDiff"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="本週最大血糖差: 20 mg/dL"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="20sp" />
             </LinearLayout>

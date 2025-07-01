@@ -15,6 +15,9 @@ import com.example.ahhapp.data.modle.IssueReportRequest;
 import com.example.ahhapp.data.modle.MedicationReminder;
 import com.example.ahhapp.data.modle.MedicationReminderRequest;
 import com.example.ahhapp.data.modle.MedicationReminderResponse;
+import com.example.ahhapp.data.modle.GetBloodSugarResponse;
+import com.example.ahhapp.data.modle.GetVitalsResponse;
+import com.example.ahhapp.data.modle.BasicHealthInfoResponse;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -74,6 +77,18 @@ public interface ApiService {
     //刪除用藥提醒
     @DELETE("health/medication/{id}")
     Call<JsonObject> deleteMedication(@Path("id") int id, @Header("Authorization") String token);
+
+    //取得基本健康資料
+    @GET("health/basic")
+    Call<BasicHealthInfoResponse> getBasicHealthInfo(@Header("Authorization") String token);
+
+    //取得血壓資料
+    @GET("health/vitals")
+    Call<GetVitalsResponse> getVitals(@Header("Authorization") String token);
+
+    //取得血糖資料
+    @GET("health/bloodSugar")
+    Call<GetBloodSugarResponse> getBloodSugar(@Header("Authorization") String token);
 
     // @Body 表示這個參數會變成 JSON 傳到伺服器
 }
