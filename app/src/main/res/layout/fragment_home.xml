@@ -10,47 +10,15 @@
         android:background="#C8F5CC">
 
         <!-- 上方使用者資訊 (頭像 + Username) -->
-        <LinearLayout
-            android:id="@+id/etProfile"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/home_header_bg"
-            android:padding="15dp">
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
 
-            <!-- 左側圖片 -->
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:src="@drawable/ic_header_edit"
-                android:scaleType="centerInside" />
-
-            <!-- 中間使用者名稱 -->
-            <TextView
-                android:id="@+id/tvUsername"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Username"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <ImageView
-                android:id="@+id/ivUserPhoto"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:src="@drawable/ic_user_photo"
-                android:scaleType="centerInside" />
-
-        </LinearLayout>
+            <include layout="@layout/view_header_profile" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

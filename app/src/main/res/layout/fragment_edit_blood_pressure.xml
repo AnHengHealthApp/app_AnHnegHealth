@@ -17,40 +17,12 @@
         android:layout_marginBottom="16dp" />
 
     <!-- 使用者資訊區塊（頭像列） -->
-    <LinearLayout
-        android:id="@+id/etProfile"
+    <include
+        android:id="@+id/headerProfile"
+        layout="@layout/view_header_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:background="@drawable/home_header_bg"
-        android:padding="12dp"
-        android:layout_marginBottom="24dp">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_header_edit"
-            android:scaleType="centerInside" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Username"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:gravity="center" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_user_photo"
-            android:scaleType="centerInside" />
-    </LinearLayout>
+        android:layout_marginBottom="24dp"/>
 
     <!-- 基本健康資訊 -->
     <TextView

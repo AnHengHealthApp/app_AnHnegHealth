@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#C8F5CC">
@@ -14,60 +15,33 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"/>
 
-    <!-- 頭像區塊 -->
-    <LinearLayout
-        android:id="@+id/etProfile"
+    <!-- 包裹頭像區塊，讓 layout_below 生效 -->
+    <RelativeLayout
+        android:id="@+id/headerWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
+        android:layout_below="@id/btnBack"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
-        android:layout_below="@id/btnBack"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:background="@drawable/home_header_bg"
-        android:padding="15dp">
+        android:layout_marginBottom="10dp">
 
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_header_edit"
-            android:scaleType="centerInside" />
+        <include
+            android:id="@+id/headerProfile"
+            layout="@layout/view_header_profile" />
+    </RelativeLayout>
 
-        <TextView
-            android:id="@+id/tvUsername"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Username"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:gravity="center" />
-
-        <ImageView
-            android:id="@+id/ivUserPhoto"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_user_photo"
-            android:scaleType="centerInside" />
-    </LinearLayout>
-
-    <!-- 包住聊天背景 + 輸入框的深色區塊 -->
+    <!-- 聊天背景區塊 -->
     <RelativeLayout
         android:id="@+id/chatBackgroundContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/etProfile"
+        android:layout_below="@id/headerWrapper"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/chat_container_bg">
 
-        <!-- 聊天訊息清單 -->
+        <!-- 訊息清單 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerChat"
             android:layout_width="match_parent"
@@ -77,7 +51,7 @@
             android:clipToPadding="false"
             android:overScrollMode="never" />
 
-        <!-- 輸入欄 -->
+        <!-- 輸入區 -->
         <LinearLayout
             android:id="@+id/chatInputContainer"
             android:layout_width="match_parent"
