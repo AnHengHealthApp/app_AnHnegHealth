@@ -4,6 +4,8 @@ import com.example.ahhapp.data.modle.RegisterRequest;
 import com.example.ahhapp.data.modle.RegisterResponse;
 import com.example.ahhapp.data.modle.LoginRequest;
 import com.example.ahhapp.data.modle.LoginResponse;
+import com.example.ahhapp.data.modle.UpdateAvatarResponse;
+import com.example.ahhapp.data.modle.UpdateUserProfileResponse;
 import com.example.ahhapp.data.modle.VitalsRequest;
 import com.example.ahhapp.data.modle.VitalsResponse;
 import com.example.ahhapp.data.modle.UpdateProfileRequest;
@@ -18,18 +20,22 @@ import com.example.ahhapp.data.modle.MedicationReminderResponse;
 import com.example.ahhapp.data.modle.GetBloodSugarResponse;
 import com.example.ahhapp.data.modle.GetVitalsResponse;
 import com.example.ahhapp.data.modle.BasicHealthInfoResponse;
+import com.example.ahhapp.data.modle.UpdateUserProfileRequest;
 import com.google.gson.JsonObject;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Header;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 
@@ -89,6 +95,22 @@ public interface ApiService {
     //取得血糖資料
     @GET("health/bloodSugar")
     Call<GetBloodSugarResponse> getBloodSugar(@Header("Authorization") String token);
+
+    //更新使用者頭像
+    @Multipart
+    @POST("user/avatar")
+    Call<UpdateAvatarResponse> uploadAvatar(
+            @Part MultipartBody.Part avatar,
+            @Header("Authorization") String token
+    );
+
+    //更新使用者資料
+    @POST("user/profile")
+    Call<UpdateUserProfileResponse> updateUserProfile(
+            @Body UpdateUserProfileRequest request,
+            @Header("Authorization") String token
+    );
+
 
     // @Body 表示這個參數會變成 JSON 傳到伺服器
 }

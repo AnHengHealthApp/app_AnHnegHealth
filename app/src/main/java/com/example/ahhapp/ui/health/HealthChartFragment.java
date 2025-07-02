@@ -64,10 +64,6 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
         return view;
     }
 
-    @Override
-    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
-        Toast.makeText(getContext(), "資料已回傳！" ,Toast.LENGTH_SHORT).show();
-    }
 
     //將血壓資料填入圖表
     private void setupBloodPressureChart() {
@@ -175,5 +171,11 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
 
 
         chart.invalidate(); // 刷新圖表
+    }
+
+    //頭像列更新
+    @Override
+    public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
+        Toast.makeText(getContext(), "資料更新中..." ,Toast.LENGTH_SHORT).show();
     }
 }

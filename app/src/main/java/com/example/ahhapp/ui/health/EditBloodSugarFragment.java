@@ -237,7 +237,7 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
 
     @Override
     public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
-        Toast.makeText(getContext(), "資料已回傳！", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "資料更新中..." ,Toast.LENGTH_SHORT).show();
     }
 
     @Override

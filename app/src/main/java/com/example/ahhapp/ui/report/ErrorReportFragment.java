@@ -107,9 +107,9 @@ public class ErrorReportFragment extends Fragment implements EditProfileDialogFr
     }
 
 
-    // 這是用來接收 dialog 回傳資料的地方（只顯示 Toast）
+    // 頭像列更新
     @Override
     public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
-        Toast.makeText(getContext(), "輸入完成,已成功變更", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "資料更新中..." ,Toast.LENGTH_SHORT).show();
     }
 }
