@@ -6,6 +6,7 @@ import com.example.ahhapp.data.modle.LoginRequest;
 import com.example.ahhapp.data.modle.LoginResponse;
 import com.example.ahhapp.data.modle.UpdateAvatarResponse;
 import com.example.ahhapp.data.modle.UpdateUserProfileResponse;
+import com.example.ahhapp.data.modle.UserProfileResponse;
 import com.example.ahhapp.data.modle.VitalsRequest;
 import com.example.ahhapp.data.modle.VitalsResponse;
 import com.example.ahhapp.data.modle.UpdateProfileRequest;
@@ -26,6 +27,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 import retrofit2.http.Body;
@@ -111,6 +113,14 @@ public interface ApiService {
             @Header("Authorization") String token
     );
 
+
+    //取得使用者資料
+    @GET("user/profile")
+    Call<UserProfileResponse> getUserProfile(@Header("Authorization") String token);
+
+    //取得使用者頭像
+    @GET("user/avatar")
+    Call<ResponseBody> getUserAvatar(@Header("Authorization") String token);
 
     // @Body 表示這個參數會變成 JSON 傳到伺服器
 }
