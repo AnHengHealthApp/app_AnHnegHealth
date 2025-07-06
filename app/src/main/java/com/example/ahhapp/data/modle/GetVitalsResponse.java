@@ -22,5 +22,6 @@ public class GetVitalsResponse {
         public int getHeartRate() { return heart_rate; }
         public int getSystolicPressure() { return systolic_pressure; }
         public int getDiastolicPressure() { return diastolic_pressure; }
+        public String getMeasurementDate() { return measurement_date; }
     }
 }

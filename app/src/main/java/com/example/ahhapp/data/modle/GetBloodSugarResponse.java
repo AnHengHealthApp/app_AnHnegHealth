@@ -20,5 +20,6 @@ public class GetBloodSugarResponse {
 
         public int getMeasurementContext() { return measurement_context; }
         public double getBloodSugar() { return blood_sugar; }
+        public String getMeasurementDate(){ return measurement_date; }
     }
 }
