@@ -36,64 +36,53 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class HealthChartFragment extends  Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
-    private LineChart bloodPressureChart;
-    private LineChart bloodSugarChart;
-
+public class HealthChartFragment extends Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
+    private LineChart bloodPressureChart, bloodSugarChart;
     private TextView tvUsername;
     private ImageView ivUserPhoto;
 
-    // 暫存
     private Bitmap cachedAvatar = null;
     private String cachedUsername = null;
 
-    //空建構子
     public HealthChartFragment() {}
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState){
-
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_health_chart, container, false);
 
-        //初始化頭像列 UI 元件
         tvUsername = view.findViewById(R.id.tvUsername);
         ivUserPhoto = view.findViewById(R.id.ivUserPhoto);
 
-        // 如果有快取資料先顯示
         if (cachedUsername != null) tvUsername.setText(cachedUsername);
-        if (cachedAvatar != null) {
-            ivUserPhoto.setImageBitmap(cachedAvatar);
-        } else {
-            ivUserPhoto.setImageResource(R.drawable.ic_user_photo);
-        }
+        if (cachedAvatar != null) ivUserPhoto.setImageBitmap(cachedAvatar);
+        else ivUserPhoto.setImageResource(R.drawable.ic_user_photo);
 
-        // 載入使用者資料
         loadUserProfile();
 
-        // 綁定頭像列並設點擊事件
         view.findViewById(R.id.etProfile).setOnClickListener(v -> {
             EditProfileDialogFragment dialog = new EditProfileDialogFragment();
-            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
+            dialog.setListener(this);
             dialog.show(getParentFragmentManager(), "EditProfileDialog");
         });
 
-        // 綁定返回鍵
-        ImageView btnBack = view.findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+        view.findViewById(R.id.btnBack).setOnClickListener(v ->
+                Navigation.findNavController(v).popBackStack());
 
-        // 綁定圖表
         bloodPressureChart = view.findViewById(R.id.lineChartBloodPressure);
         bloodSugarChart = view.findViewById(R.id.lineChartBloodSugar);
 
@@ -103,8 +92,6 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
         return view;
     }
 
-
-    //取得token
     private String getAuthHeader() {
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String token = prefs.getString("token", null);
@@ -115,9 +102,7 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
         return "Bearer " + token;
     }
 
-    //取得血壓與心跳資料並顯示
     private void fetchAndShowVitals() {
-
         String authHeader = getAuthHeader();
         if (authHeader == null) return;
 
@@ -125,22 +110,23 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
         apiService.getVitals(authHeader).enqueue(new Callback<GetVitalsResponse>() {
             @Override
             public void onResponse(Call<GetVitalsResponse> call, Response<GetVitalsResponse> response) {
-
                 if (!response.isSuccessful() || response.body() == null) {
                     Toast.makeText(getContext(), "血壓資料獲取失敗", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 List<GetVitalsResponse.VitalsData> data = response.body().getData();
-
                 if (data == null || data.isEmpty()) {
                     bloodPressureChart.clear();
-                    Toast.makeText(getContext(), "目前您沒有資料，無法生成圖表", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "目前您沒有血壓資料，無法生成圖表", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (data.size() < 7) {
-                    Toast.makeText(getContext(), "資料未滿7天，顯示目前資料", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "血壓資料未滿7天，顯示目前資料", Toast.LENGTH_SHORT).show();
                 }
+
+                //將傳入的資料順序顛倒,確保x軸資料由日期最遠排到最近(ex: 7/1 - 7/7)
+                Collections.reverse(data);
 
                 List<Entry> systolicEntries = new ArrayList<>();
                 List<Entry> diastolicEntries = new ArrayList<>();
@@ -164,17 +150,9 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
                     }
                 }
 
-                LineDataSet set1 = new LineDataSet(systolicEntries, "收縮壓");
-                set1.setColor(Color.RED);
-                set1.setCircleColor(Color.RED);
-
-                LineDataSet set2 = new LineDataSet(diastolicEntries, "舒張壓");
-                set2.setColor(Color.BLUE);
-                set2.setCircleColor(Color.BLUE);
-
-                LineDataSet set3 = new LineDataSet(heartRateEntries, "心跳");
-                set3.setColor(Color.GREEN);
-                set3.setCircleColor(Color.GREEN);
+                LineDataSet set1 = createBeautifulDataSet(systolicEntries, "收縮壓", Color.RED);
+                LineDataSet set2 = createBeautifulDataSet(diastolicEntries, "舒張壓", Color.BLUE);
+                LineDataSet set3 = createBeautifulDataSet(heartRateEntries, "心跳", Color.GREEN);
 
                 LineData lineData = new LineData(set1, set2, set3);
                 bloodPressureChart.setData(lineData);
@@ -193,7 +171,6 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
         });
     }
 
-    //取得血糖資料並顯示
     private void fetchAndShowBloodSugar() {
         String authHeader = getAuthHeader();
         if (authHeader == null) return;
@@ -210,43 +187,57 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
                 List<GetBloodSugarResponse.BloodSugarData> data = response.body().getData();
                 if (data == null || data.isEmpty()) {
                     bloodSugarChart.clear();
-                    Toast.makeText(getContext(), "目前您沒有資料，無法生成圖表", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "目前您沒有血糖資料，無法生成圖表", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (data.size() < 7) {
-                    Toast.makeText(getContext(), "資料未滿7天，顯示目前資料", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "血糖資料未滿7天，顯示目前資料", Toast.LENGTH_SHORT).show();
+                }
+
+                // 合併同一天的空腹 & 餐後
+                TreeMap<String, BloodSugarDay> dayMap = new TreeMap<>();
+                SimpleDateFormat serverFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MM-dd", Locale.getDefault());
+
+                for (GetBloodSugarResponse.BloodSugarData item : data) {
+                    String dateKey = "";
+                    try {
+                        Date date = serverFormat.parse(item.getMeasurementDate());
+                        dateKey = displayFormat.format(date);
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    BloodSugarDay day = dayMap.getOrDefault(dateKey, new BloodSugarDay());
+                    if (item.getMeasurementContext() == 0) {
+                        day.fasting = (float) item.getBloodSugar();
+                    } else if (item.getMeasurementContext() == 2) {
+                        day.postMeal = (float) item.getBloodSugar();
+                    }
+                    dayMap.put(dateKey, day);
                 }
 
                 List<Entry> fastingEntries = new ArrayList<>();
                 List<Entry> postMealEntries = new ArrayList<>();
                 List<String> xLabels = new ArrayList<>();
 
-                SimpleDateFormat serverFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                SimpleDateFormat displayFormat = new SimpleDateFormat("MM-dd", Locale.getDefault());
+                int index = 0;
+                for (Map.Entry<String, BloodSugarDay> entry : dayMap.entrySet()) {
+                    String date = entry.getKey();
+                    BloodSugarDay day = entry.getValue();
 
-                for (int i = 0; i < data.size(); i++) {
-                    GetBloodSugarResponse.BloodSugarData item = data.get(i);
-                    if (item.getMeasurementContext() == 0) {
-                        fastingEntries.add(new Entry(i, (float) item.getBloodSugar()));
-                    } else if (item.getMeasurementContext() == 2) {
-                        postMealEntries.add(new Entry(i, (float) item.getBloodSugar()));
+                    if (day.fasting != null) {
+                        fastingEntries.add(new Entry(index, day.fasting));
                     }
-
-                    try {
-                        Date date = serverFormat.parse(item.getMeasurementDate());
-                        xLabels.add(displayFormat.format(date));
-                    } catch (Exception e) {
-                        xLabels.add("");
+                    if (day.postMeal != null) {
+                        postMealEntries.add(new Entry(index, day.postMeal));
                     }
+                    xLabels.add(date);
+                    index++;
                 }
 
-                LineDataSet set1 = new LineDataSet(fastingEntries, "空腹血糖");
-                set1.setColor(Color.RED);
-                set1.setCircleColor(Color.RED);
-
-                LineDataSet set2 = new LineDataSet(postMealEntries, "餐後血糖");
-                set2.setColor(Color.MAGENTA);
-                set2.setCircleColor(Color.MAGENTA);
+                LineDataSet set1 = createBeautifulDataSet(fastingEntries, "空腹血糖", Color.RED);
+                LineDataSet set2 = createBeautifulDataSet(postMealEntries, "餐後血糖", Color.MAGENTA);
 
                 LineData lineData = new LineData(set1, set2);
                 bloodSugarChart.setData(lineData);
@@ -265,42 +256,74 @@ public class HealthChartFragment extends  Fragment implements EditProfileDialogF
         });
     }
 
+    //使用MAP防止血糖資料日期重複
+    private static class BloodSugarDay {
+        Float fasting;
+        Float postMeal;
+    }
+
+    //設定DataSet
+    private LineDataSet createBeautifulDataSet(List<Entry> entries, String label, int color) {
+        LineDataSet set = new LineDataSet(entries, label);
+        set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        set.setLineWidth(3f);
+        set.setColor(color);
+        set.setCircleColor(color);
+        set.setCircleRadius(5f);
+        set.setCircleHoleRadius(2f);
+        set.setDrawCircles(true);
+        set.setDrawValues(false);
+        return set;
+    }
+
     //設定圖表樣式
     private void styleChart(LineChart chart) {
-        chart.getDescription().setEnabled(false); // 不顯示描述
+        chart.setBackgroundColor(Color.BLACK); // 暗色背景
+        chart.getDescription().setEnabled(false);
         chart.setDrawGridBackground(false);
 
-        // 給圖表留出額外的邊距
+        // 留白
         chart.setExtraOffsets(10, 10, 10, 10);
-        chart.setExtraBottomOffset(40f); // 留出 Legend 空間
+        chart.setExtraBottomOffset(20f);
 
+        chart.setTouchEnabled(false);
+        chart.setDragEnabled(false);
+        chart.setScaleEnabled(false);
+
+        // X 軸
         XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // X 軸在底部
-        xAxis.setDrawGridLines(false); // 不畫網格線
-        xAxis.setTextSize(16f); // X軸標籤文字
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(14f);
+        xAxis.setTextColor(Color.WHITE);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelRotationAngle(-30f);// 防擠壓
 
+        // Y 軸
         YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setDrawGridLines(true); // 顯示左側網格線
-        leftAxis.setTextSize(16f); // Y軸標籤文字
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setTextSize(14f);
+        leftAxis.setTextColor(Color.WHITE);
 
-        chart.getAxisRight().setEnabled(false);// 右側 Y 軸不要
+        chart.getAxisRight().setEnabled(false);
 
+        // Legend
         Legend legend = chart.getLegend();
         legend.setForm(Legend.LegendForm.LINE);
-        legend.setTextSize(16f);
-        legend.setFormSize(12f);               // 小線條或方塊的大小
-        legend.setXEntrySpace(20f);           // 每個 legend 項目之間的間距
-        legend.setFormToTextSpace(5f);       // 小線/方塊 和文字的距離
-
-        // 調整 Legend 位置
+        legend.setTextSize(14f);
+        legend.setFormSize(14f);
+        legend.setXEntrySpace(20f);
+        legend.setFormToTextSpace(8f);
         legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         legend.setDrawInside(false);
         legend.setWordWrapEnabled(true);
+        legend.setTextColor(Color.WHITE);
 
 
-        chart.invalidate(); // 刷新圖表
+        chart.animateX(500); // 加點動畫
+        chart.invalidate();
     }
 
     // 更新頭像列資料

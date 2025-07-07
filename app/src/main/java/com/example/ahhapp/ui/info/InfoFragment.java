@@ -31,6 +31,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -246,19 +249,45 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
                     double fastingSum = 0, postSum = 0;
                     int fastingCount = 0, postCount = 0;
 
+                    Map<String, Day> dayMap = new TreeMap<>();
+                    SimpleDateFormat serverFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    SimpleDateFormat displayFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
                     for (GetBloodSugarResponse.BloodSugarData sugar : list) {
+                        String dateKey = "";
+                        try {
+                            Date date = serverFormat.parse(sugar.getMeasurementDate());
+                            dateKey = displayFormat.format(date);
+                        } catch (Exception e) {
+                            continue;
+                        }
+
+                        Day day = dayMap.getOrDefault(dateKey, new Day());
                         if (sugar.getMeasurementContext() == 0) {
+                            day.fasting = sugar.getBloodSugar();
                             fastingSum += sugar.getBloodSugar();
                             fastingCount++;
                         } else if (sugar.getMeasurementContext() == 2) {
+                            day.postMeal = sugar.getBloodSugar();
                             postSum += sugar.getBloodSugar();
                             postCount++;
                         }
+                        dayMap.put(dateKey, day);
                     }
 
                     double fastingAvg = fastingCount > 0 ? fastingSum / fastingCount : 0;
                     double postAvg = postCount > 0 ? postSum / postCount : 0;
-                    double maxDiff = Math.abs(postAvg - fastingAvg);
+
+                    double maxDiff = 0;
+                    for (Map.Entry<String, Day> entry : dayMap.entrySet()) {
+                        Day d = entry.getValue();
+                        if (d.fasting != null && d.postMeal != null) {
+                            double diff = d.postMeal - d.fasting;
+                            if (diff > maxDiff) {
+                                maxDiff = diff;
+                            }
+                        }
+                    }
 
                     tvAvgFastingGlucose.setText("本週平均空腹血糖: " + (int) fastingAvg + " mg/dL");
                     tvAvgPostprandialGlucose.setText("本週平均餐後血糖: " + (int) postAvg + " mg/dL");
@@ -279,6 +308,11 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
                 tvMaxGlucoseDiff.setText("本週最大血糖差: 無資料");
             }
         });
+    }
+
+    private static class Day {
+        Double fasting;
+        Double postMeal;
     }
 
     private void navigateTo(int id) {

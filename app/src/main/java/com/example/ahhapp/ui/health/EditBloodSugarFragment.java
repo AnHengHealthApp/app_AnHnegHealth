@@ -209,6 +209,7 @@ public class EditBloodSugarFragment extends Fragment implements EditProfileDialo
         }
 
         BloodSugarRequest request = new BloodSugarRequest(date, context, sugar);
+
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<BloodSugarResponse> call = apiService.addBloodSugar(request, "Bearer " + token);
 
