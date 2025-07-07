@@ -122,5 +122,4 @@ public interface ApiService {
     @GET("user/avatar")
     Call<ResponseBody> getUserAvatar(@Header("Authorization") String token);
 
-    // @Body 表示這個參數會變成 JSON 傳到伺服器
 }
