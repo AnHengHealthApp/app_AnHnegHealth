@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/logo"
+        android:layout_marginRight="8dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:gravity="center_vertical">
+<!--        android:background="@drawable/chat_bubble_bot_bg"-->
+        <!-- 等待中的文字 -->
+        <TextView
+            android:id="@+id/tvTypingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="等待助手回覆中..."
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginRight="8dp"/>
+
+        <!-- 白色的進度圈 -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@android:color/white"/>
+    </LinearLayout>
+</LinearLayout>

@@ -79,8 +79,8 @@
                 android:id="@+id/btnMic"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_mic"
-                android:layout_marginLeft="8dp" />
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/ic_mic" />
 
             <ImageView
                 android:id="@+id/btnSend"

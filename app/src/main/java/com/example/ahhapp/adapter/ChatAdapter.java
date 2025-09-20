@@ -16,9 +16,14 @@ import com.example.ahhapp.R;
 
 import java.util.ArrayList;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    // 定義兩種訊息類型：使用者發送、AI 回覆
+    // 定義三種訊息類型：使用者發送、AI 回覆、等待AI回覆
     private static final int VIEW_TYPE_USER = 1;
     private static final int VIEW_TYPE_BOT = 2;
+
+    private static final int VIEW_TYPE_TYPING = 3;
+
+    // 內部用的標記
+    private static final String MSG_TYPING_SENTINEL = "\uD83D\uDD04__TYPING__";
 
     private final Context context;
     private final ArrayList<ChatMessage> messages; // 存放訊息資料的列表
@@ -32,21 +37,28 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     // 根據訊息的類型回傳不同的 viewType（讓系統知道該用哪個 layout）
     @Override
     public int getItemViewType(int position) {
-        return messages.get(position).isUser() ? VIEW_TYPE_USER : VIEW_TYPE_BOT;
+        ChatMessage m = messages.get(position);
+        if (!m.isUser() && MSG_TYPING_SENTINEL.equals(m.getMessage())) {
+            return VIEW_TYPE_TYPING; // typing 泡泡
+        }
+        return m.isUser() ? VIEW_TYPE_USER : VIEW_TYPE_BOT;
     }
 
     // 創建對應類型的 ViewHolder（根據訊息是自己還是 AI）
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inf = LayoutInflater.from(context);
         // 使用者訊息使用 item_chat_user.xml
         if (viewType == VIEW_TYPE_USER) {
-            View view = LayoutInflater.from(context).inflate(R.layout.item_chat_user, parent, false);
-            return new UserViewHolder(view);
+            View v = inf.inflate(R.layout.item_chat_user, parent, false);
+            return new UserViewHolder(v);
+        } else if (viewType == VIEW_TYPE_BOT) {
+            View v = inf.inflate(R.layout.item_chat_bot, parent, false);
+            return new BotViewHolder(v);
         } else {
-            // AI 訊息使用 item_chat_bot.xml
-            View view = LayoutInflater.from(context).inflate(R.layout.item_chat_bot, parent, false);
-            return new BotViewHolder(view);
+            View v = inf.inflate(R.layout.item_chat_typing, parent, false);
+            return new TypingViewHolder(v);
         }
     }
 
@@ -58,10 +70,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         // 如果是使用者訊息
         if (holder instanceof UserViewHolder) {
             ((UserViewHolder) holder).userMessage.setText(msg.getMessage());
-
             // 如果是 AI 訊息
-        } else {
+        } else if (holder instanceof BotViewHolder) {
             ((BotViewHolder) holder).botMessage.setText(msg.getMessage());
+            //如果等待AI訊息
+        } else {
+            // TypingViewHolder 無需綁定文字
         }
     }
 
@@ -71,11 +85,26 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return messages.size();
     }
 
+    // 方便 Fragment 呼叫：插入 / 移除 typing
+    public void addTyping() {
+        messages.add(new ChatMessage(MSG_TYPING_SENTINEL, /*isUser*/ false));
+        notifyItemInserted(messages.size() - 1);
+    }
+    public void removeTypingIfExists() {
+        int last = messages.size() - 1;
+        if (last >= 0) {
+            ChatMessage m = messages.get(last);
+            if (!m.isUser() && MSG_TYPING_SENTINEL.equals(m.getMessage())) {
+                messages.remove(last);
+                notifyItemRemoved(last);
+            }
+        }
+    }
+
     // 自己訊息用的 ViewHolder，綁定 item_chat_user.xml 的元件
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView userMessage;
-
-        public UserViewHolder(@NonNull View itemView) {
+        UserViewHolder(@NonNull View itemView) {
             super(itemView);
             userMessage = itemView.findViewById(R.id.tvUserMessage); // 訊息文字元件
         }
@@ -85,11 +114,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class BotViewHolder extends RecyclerView.ViewHolder {
         TextView botMessage;
         ImageView ivBotAvatar;
-
-        public BotViewHolder(@NonNull View itemView) {
+        BotViewHolder(@NonNull View itemView) {
             super(itemView);
             botMessage = itemView.findViewById(R.id.tvBotMessage); // AI訊息文字
             ivBotAvatar = itemView.findViewById(R.id.ivBotAvatar); // AI 頭像
         }
+    }
+
+    //將等待訊息綁定 item_chat_bot.xml 的元件
+    static class TypingViewHolder extends RecyclerView.ViewHolder {
+        TypingViewHolder(@NonNull View itemView) { super(itemView); }
     }
 }

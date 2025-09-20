@@ -70,7 +70,9 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
 
         // RecyclerView 初始化
         RecyclerView recyclerChat = view.findViewById(R.id.recyclerChat);
-        recyclerChat.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        lm.setStackFromEnd(true); // 新增：讓新訊息在底部
+        recyclerChat.setLayoutManager(lm);
         chatAdapter = new ChatAdapter(getContext(), messageList);
         recyclerChat.setAdapter(chatAdapter);
 
@@ -80,19 +82,37 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
         ImageView btnSend = view.findViewById(R.id.btnSend);
         btnSend.setOnClickListener(v -> {
             String msg = etMessage.getText().toString().trim();
-            if (!msg.isEmpty()) {
-                messageList.add(new ChatMessage(msg, true)); // 加入我方訊息
-                chatAdapter.notifyItemInserted(messageList.size() - 1);
-                recyclerChat.scrollToPosition(messageList.size() - 1);
-                etMessage.setText("");
+            if (msg.isEmpty()) return;
 
-                // 模擬的AI回應
-                recyclerChat.postDelayed(() -> {
-                    messageList.add(new ChatMessage("我有什麼能夠幫到您的嗎?", false)); // 假AI回應
+            // 1) 插入使用者訊息
+            messageList.add(new ChatMessage(msg, true));
+            chatAdapter.notifyItemInserted(messageList.size() - 1);
+            recyclerChat.scrollToPosition(messageList.size() - 1);
+            etMessage.setText("");
+
+            // 2) 插入 Typing 泡泡
+            chatAdapter.addTyping();
+            recyclerChat.scrollToPosition(messageList.size() - 1);
+            btnSend.setEnabled(false); // 可選：避免重複送出
+
+            // 3) 呼叫 API -> 回來後移除 typing 並插入 AI 回答
+            fakeCall(new AiCallback() {
+                @Override public void onSuccess(String aiText) {
+                    chatAdapter.removeTypingIfExists();
+                    messageList.add(new ChatMessage(aiText, false));
                     chatAdapter.notifyItemInserted(messageList.size() - 1);
                     recyclerChat.scrollToPosition(messageList.size() - 1);
-                }, 500); // 模擬延遲 800 毫秒
-            }
+                    btnSend.setEnabled(true);
+                }
+                @Override public void onError(String err) {
+                    chatAdapter.removeTypingIfExists();
+                    messageList.add(new ChatMessage("抱歉，連線太忙碌，請稍後再試。", false));
+                    chatAdapter.notifyItemInserted(messageList.size() - 1);
+                    recyclerChat.scrollToPosition(messageList.size() - 1);
+                    Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
+                    btnSend.setEnabled(true);
+                }
+            });
         });
 
         // 綁定返回按鈕，點擊時返回上一頁
@@ -100,6 +120,16 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         return view;
+    }
+
+    // ---- 模擬 API  ----
+    private interface AiCallback {
+        void onSuccess(String aiText);
+        void onError(String err);
+    }
+    private void fakeCall(AiCallback cb) {
+        // 這裡用 postDelayed 模擬延遲；接上 API 時換成 enqueue/coroutine
+        requireView().postDelayed(() -> cb.onSuccess("我有什麼能夠幫到您的嗎？"), 1200);
     }
 
     private void navigateTo(int id) {
