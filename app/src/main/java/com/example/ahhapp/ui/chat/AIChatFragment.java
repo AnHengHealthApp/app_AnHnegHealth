@@ -27,16 +27,79 @@ import com.example.ahhapp.utils.UserProfileManager;
 
 import java.util.ArrayList;
 
-public class AIChatFragment extends  Fragment implements EditProfileDialogFragment.OnProfileUpdatedListener {
-    private ArrayList<ChatMessage> messageList = new ArrayList<>();
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.ActivityNotFoundException;
+import android.content.pm.PackageManager;
+import android.speech.RecognizerIntent;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+
+/**
+ * AI 聊天頁 Fragment
+ * - 支援：輸入訊息、Typing 泡泡、語音輸入 (RecognizerIntent)
+ * - 重點：UI 元件升級成成員變數以避免 requireView() 崩潰；延遲呼叫加生命週期守門
+ */
+public class AIChatFragment extends Fragment
+        implements EditProfileDialogFragment.OnProfileUpdatedListener {
+
+    // === 狀態與 Adapter ===
+    private final ArrayList<ChatMessage> messageList = new ArrayList<>();
     private ChatAdapter chatAdapter;
 
+    // === 主要 UI 參考（升級為成員變數，避免 requireView() 風險） ===
+    private RecyclerView recyclerChat;
+    private EditText etMessage;
+    private ImageView btnSend;
+
+    // === 頭像列 ===
     private TextView tvUsername;
     private ImageView ivUserPhoto;
 
-    // 暫存
+    // === 快取資料（避免每次重拉） ===
     private Bitmap cachedAvatar = null;
     private String cachedUsername = null;
+
+    // === 語音輸入：權限＆結果 Launcher ===
+    private final ActivityResultLauncher<String> micPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    startVoiceInput();
+                } else {
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "需要麥克風權限才能語音輸入", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+    private final ActivityResultLauncher<Intent> voiceInputLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    ArrayList<String> texts = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if (texts != null && !texts.isEmpty()) {
+                        String recognized = texts.get(0);
+                        if (recognized != null) recognized = recognized.trim();
+                        if (recognized == null || recognized.isEmpty()) {
+                            if (isAdded()) {
+                                Toast.makeText(requireContext(), "沒有辨識到內容，請再試一次", Toast.LENGTH_SHORT).show();
+                            }
+                            return;
+                        }
+
+                        // (A) 只填入輸入框，讓使用者確認後再送
+                        if (etMessage != null) {
+                            etMessage.setText(recognized);
+                            etMessage.setSelection(recognized.length());
+                        }
+
+                        // (B) 若想自動送出，改用：
+                        // sendText(recognized);
+                    }
+                }
+            });
 
     @Nullable
     @Override
@@ -46,98 +109,141 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
 
         View view = inflater.inflate(R.layout.fragment_ai_chat, container, false);
 
-        //初始化頭像列 UI 元件
+        // === 初始化頭像列 ===
         tvUsername = view.findViewById(R.id.tvUsername);
         ivUserPhoto = view.findViewById(R.id.ivUserPhoto);
-
-        // 如果有快取資料先顯示
         if (cachedUsername != null) tvUsername.setText(cachedUsername);
         if (cachedAvatar != null) {
             ivUserPhoto.setImageBitmap(cachedAvatar);
         } else {
             ivUserPhoto.setImageResource(R.drawable.ic_user_photo);
         }
-
-        // 載入使用者資料
+        // 非同步載入使用者資料
         loadUserProfile();
 
-        // 綁定頭像欄區塊並設定點擊事件
-        view.findViewById(R.id.etProfile).setOnClickListener(v -> {
-            EditProfileDialogFragment dialog = new EditProfileDialogFragment();
-            dialog.setListener(this); // 傳入當前 Fragment 作為 listener
-            dialog.show(getParentFragmentManager(), "EditProfileDialog");
-        });
+        // 點擊頭像列 -> 開啟編輯
+        View editProfileEntry = view.findViewById(R.id.etProfile);
+        if (editProfileEntry != null) {
+            editProfileEntry.setOnClickListener(v -> {
+                EditProfileDialogFragment dialog = new EditProfileDialogFragment();
+                dialog.setListener(this);
+                dialog.show(getParentFragmentManager(), "EditProfileDialog");
+            });
+        }
 
-        // RecyclerView 初始化
-        RecyclerView recyclerChat = view.findViewById(R.id.recyclerChat);
+        // === RecyclerView 初始化 ===
+        recyclerChat = view.findViewById(R.id.recyclerChat);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
-        lm.setStackFromEnd(true); // 新增：讓新訊息在底部
+        lm.setStackFromEnd(true); // 新訊息靠底
         recyclerChat.setLayoutManager(lm);
         chatAdapter = new ChatAdapter(getContext(), messageList);
         recyclerChat.setAdapter(chatAdapter);
 
-
-        // 發送訊息按鈕
-        EditText etMessage = view.findViewById(R.id.etMessage);
-        ImageView btnSend = view.findViewById(R.id.btnSend);
+        // === 輸入與送出 ===
+        etMessage = view.findViewById(R.id.etMessage);
+        btnSend = view.findViewById(R.id.btnSend);
         btnSend.setOnClickListener(v -> {
             String msg = etMessage.getText().toString().trim();
             if (msg.isEmpty()) return;
-
-            // 1) 插入使用者訊息
-            messageList.add(new ChatMessage(msg, true));
-            chatAdapter.notifyItemInserted(messageList.size() - 1);
-            recyclerChat.scrollToPosition(messageList.size() - 1);
-            etMessage.setText("");
-
-            // 2) 插入 Typing 泡泡
-            chatAdapter.addTyping();
-            recyclerChat.scrollToPosition(messageList.size() - 1);
-            btnSend.setEnabled(false); // 可選：避免重複送出
-
-            // 3) 呼叫 API -> 回來後移除 typing 並插入 AI 回答
-            fakeCall(new AiCallback() {
-                @Override public void onSuccess(String aiText) {
-                    chatAdapter.removeTypingIfExists();
-                    messageList.add(new ChatMessage(aiText, false));
-                    chatAdapter.notifyItemInserted(messageList.size() - 1);
-                    recyclerChat.scrollToPosition(messageList.size() - 1);
-                    btnSend.setEnabled(true);
-                }
-                @Override public void onError(String err) {
-                    chatAdapter.removeTypingIfExists();
-                    messageList.add(new ChatMessage("抱歉，連線太忙碌，請稍後再試。", false));
-                    chatAdapter.notifyItemInserted(messageList.size() - 1);
-                    recyclerChat.scrollToPosition(messageList.size() - 1);
-                    Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
-                    btnSend.setEnabled(true);
-                }
-            });
+            sendText(msg);
         });
 
-        // 綁定返回按鈕，點擊時返回上一頁
+        // === 麥克風 ===
+        ImageView btnMic = view.findViewById(R.id.btnMic);
+        btnMic.setOnClickListener(v -> {
+            v.setEnabled(false);                 // 避免連點
+            onMicClick();                        // 開啟語音輸入
+            v.postDelayed(() -> v.setEnabled(true), 1500); // 1.5s 後恢復
+        });
+
+        // 返回鍵
         ImageView btnBack = view.findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         return view;
     }
 
-    // ---- 模擬 API  ----
+    // === 共用送出流程（按鈕/語音皆可調用） ===
+    private void sendText(String msg) {
+        // 1) 插入使用者訊息
+        messageList.add(new ChatMessage(msg, true));
+        chatAdapter.notifyItemInserted(messageList.size() - 1);
+        recyclerChat.scrollToPosition(messageList.size() - 1);
+        if (etMessage != null) etMessage.setText("");
+
+        // 2) 顯示 Typing 泡泡
+        chatAdapter.addTyping();
+        recyclerChat.scrollToPosition(messageList.size() - 1);
+        if (btnSend != null) btnSend.setEnabled(false);
+
+        // 3) 呼叫 API（此處用假呼叫），回來後替換內容
+        fakeCall(new AiCallback() {
+            @Override public void onSuccess(String aiText) {
+                if (!isAdded()) return; // Fragment 已離開畫面
+                chatAdapter.removeTypingIfExists();
+                messageList.add(new ChatMessage(aiText, false));
+                chatAdapter.notifyItemInserted(messageList.size() - 1);
+                recyclerChat.scrollToPosition(messageList.size() - 1);
+                if (btnSend != null) btnSend.setEnabled(true);
+            }
+            @Override public void onError(String err) {
+                if (!isAdded()) return;
+                chatAdapter.removeTypingIfExists();
+                messageList.add(new ChatMessage("抱歉，連線太忙碌，請稍後再試。", false));
+                chatAdapter.notifyItemInserted(messageList.size() - 1);
+                recyclerChat.scrollToPosition(messageList.size() - 1);
+                Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
+                if (btnSend != null) btnSend.setEnabled(true);
+            }
+        });
+    }
+
+    // === 語音輸入 ===
+    private void onMicClick() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED) {
+            startVoiceInput();
+        } else {
+            micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+        }
+    }
+
+    private void startVoiceInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-TW"); // 可改 Locale.getDefault()
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "請開始說話…");
+        try {
+            voiceInputLauncher.launch(intent);
+        } catch (ActivityNotFoundException e) {
+            if (isAdded()) {
+                Toast.makeText(requireContext(), "裝置未安裝語音服務，請更新 Google App", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    // === 模擬 API ===
     private interface AiCallback {
         void onSuccess(String aiText);
         void onError(String err);
     }
+
     private void fakeCall(AiCallback cb) {
-        // 這裡用 postDelayed 模擬延遲；接上 API 時換成 enqueue/coroutine
-        requireView().postDelayed(() -> cb.onSuccess("我有什麼能夠幫到您的嗎？"), 1200);
+        // 使用 recyclerChat 發送延遲 runnable；若視圖已被銷毀就不執行
+        if (recyclerChat == null) return;
+        recyclerChat.postDelayed(() -> {
+            if (!isAdded() || recyclerChat == null) return;
+            cb.onSuccess("我有什麼能夠幫到您的嗎？");
+        }, 1200);
     }
 
+    // === 導航（目前未使用，保留） ===
     private void navigateTo(int id) {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(id);
     }
 
-    // 更新頭像列資料
+    // === 載入使用者資料（頭像列） ===
     private void loadUserProfile() {
         UserProfileManager.loadUserProfile(requireContext(), new UserProfileManager.OnProfileLoadedListener() {
             @Override
@@ -145,6 +251,7 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
                 cachedUsername = username;
                 cachedAvatar = avatar;
 
+                if (!isAdded()) return;
                 tvUsername.setText(username);
                 if (avatar != null) {
                     ivUserPhoto.setImageBitmap(avatar);
@@ -155,26 +262,35 @@ public class AIChatFragment extends  Fragment implements EditProfileDialogFragme
 
             @Override
             public void onError(String errorMsg) {
+                if (!isAdded()) return;
                 Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    //更新資料後的toast
+    // === 編輯個資回呼 ===
     @Override
     public void onProfileUpdated(String newName, String newEmail, Uri imageUri) {
-        // 不等後端回傳，直接更新顯示
+        if (!isAdded()) return;
         Toast.makeText(getContext(), "資料更新中...", Toast.LENGTH_SHORT).show();
-        if (!newName.isEmpty()) {
+        if (newName != null && !newName.isEmpty()) {
             cachedUsername = newName;
             tvUsername.setText(newName);
         }
         if (imageUri != null) {
             ivUserPhoto.setImageURI(imageUri);
         }
-
-        // 同時還是呼叫一次後端去刷新快取
         tvUsername.postDelayed(this::loadUserProfile, 2000);
     }
 
+    // === 清理：避免持有已被銷毀的 View 參考 ===
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        recyclerChat = null;
+        etMessage = null;
+        btnSend = null;
+        tvUsername = null;
+        ivUserPhoto = null;
+    }
 }

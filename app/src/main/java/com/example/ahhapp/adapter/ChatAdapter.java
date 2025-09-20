@@ -75,7 +75,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((BotViewHolder) holder).botMessage.setText(msg.getMessage());
             //如果等待AI訊息
         } else {
-            // TypingViewHolder 無需綁定文字
+            // XML 內文字與 ProgressBar 已處理
         }
     }
 
