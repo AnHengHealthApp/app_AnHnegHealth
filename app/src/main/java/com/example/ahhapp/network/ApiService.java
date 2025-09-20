@@ -122,4 +122,7 @@ public interface ApiService {
     @GET("user/avatar")
     Call<ResponseBody> getUserAvatar(@Header("Authorization") String token);
 
+
+    @GET("health/bloodSugar")
+    Call<okhttp3.ResponseBody> getBloodSugarRaw(@Header("Authorization") String token);
 }

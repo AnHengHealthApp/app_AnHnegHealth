@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.example.ahhapp.network.ApiService;
 import com.example.ahhapp.network.RetrofitClient;
 import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
 import com.example.ahhapp.utils.UserProfileManager;
+import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,6 +36,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+import android.util.Log;
+import okhttp3.ResponseBody;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -236,9 +240,18 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
     // 取得血糖資訊
     private void fetchBloodSugar() {
         ApiService api = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        String token = getToken();
         api.getBloodSugar(getToken()).enqueue(new Callback<GetBloodSugarResponse>() {
             @Override
-            public void onResponse(@NonNull Call<GetBloodSugarResponse> call, @NonNull Response<GetBloodSugarResponse> response) {
+            public void onResponse(@NonNull Call<GetBloodSugarResponse> call,
+                                   @NonNull Response<GetBloodSugarResponse> response) {
+                // ✅ 成功進到 onResponse 時，把解析後的物件轉回 JSON 印出（驗證欄位）
+                try {
+                    Log.d("BloodSugarAPI_Info", "parsed body = " + new Gson().toJson(response.body()));
+                } catch (Exception e) {
+                    Log.e("BloodSugarAPI_Info", "log parsed body failed", e);
+                }
+
                 if (response.isSuccessful() && response.body() != null) {
                     List<GetBloodSugarResponse.BloodSugarData> list = response.body().getData();
                     if (list == null || list.isEmpty()) {
@@ -254,6 +267,12 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
                     SimpleDateFormat displayFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
                     for (GetBloodSugarResponse.BloodSugarData sugar : list) {
+                        // 🔎 逐筆印出原始值，方便找是哪筆髒資料
+                        Log.d("BloodSugarAPI_Info:item",
+                                "date=" + sugar.getMeasurementDate()
+                                        + ", ctx=" + sugar.getMeasurementContext()
+                                        + ", val=" + sugar.getBloodSugar());
+
                         String dateKey = "";
                         try {
                             Date date = serverFormat.parse(sugar.getMeasurementDate());
@@ -263,13 +282,18 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
                         }
 
                         Day day = dayMap.getOrDefault(dateKey, new Day());
-                        if (sugar.getMeasurementContext() == 0) {
-                            day.fasting = sugar.getBloodSugar();
-                            fastingSum += sugar.getBloodSugar();
+
+                        Integer ctx = sugar.getMeasurementContext();
+                        Double val = sugar.getBloodSugar();
+                        if (ctx == null || val == null) continue;
+
+                        if (ctx == 0 || ctx == 1) { // 空腹 or 餐前
+                            day.fasting = val;
+                            fastingSum += val;
                             fastingCount++;
-                        } else if (sugar.getMeasurementContext() == 2) {
-                            day.postMeal = sugar.getBloodSugar();
-                            postSum += sugar.getBloodSugar();
+                        } else if (ctx == 2) { // 餐後
+                            day.postMeal = val;
+                            postSum += val;
                             postCount++;
                         }
                         dayMap.put(dateKey, day);
@@ -289,9 +313,9 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
                         }
                     }
 
-                    tvAvgFastingGlucose.setText("本週平均空腹血糖: " + (int) fastingAvg + " mg/dL");
-                    tvAvgPostprandialGlucose.setText("本週平均餐後血糖: " + (int) postAvg + " mg/dL");
-                    tvMaxGlucoseDiff.setText("本週最大血糖差: " + (int) maxDiff + " mg/dL");
+                    tvAvgFastingGlucose.setText("本週平均空腹血糖: " + (fastingCount > 0 ? (int) fastingAvg + " mg/dL" : "無資料"));
+                    tvAvgPostprandialGlucose.setText("本週平均餐後血糖: " + (postCount > 0 ? (int) postAvg + " mg/dL" : "無資料"));
+                    tvMaxGlucoseDiff.setText("本週最大血糖差: " + (maxDiff > 0 ? (int) maxDiff + " mg/dL" : "無資料"));
                 } else {
                     showNoBloodSugarData();
                 }
@@ -299,6 +323,10 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
 
             @Override
             public void onFailure(@NonNull Call<GetBloodSugarResponse> call, @NonNull Throwable t) {
+                // ❗大多數會進到這裡（NumberFormatException），所以再打 raw 端點把 JSON 印出來
+                Log.e("BloodSugarAPI_Info", "parse fail: " + t);
+                fetchBloodSugarRawForLog(token, "BloodSugarRAW_Info");
+
                 showNoBloodSugarData();
             }
 
@@ -306,6 +334,24 @@ public class InfoFragment extends Fragment implements EditProfileDialogFragment.
                 tvAvgFastingGlucose.setText("本週平均空腹血糖: 無資料");
                 tvAvgPostprandialGlucose.setText("本週平均餐後血糖: 無資料");
                 tvMaxGlucoseDiff.setText("本週最大血糖差: 無資料");
+            }
+        });
+    }
+
+    // 只做除錯：拉 raw JSON 來看
+    private void fetchBloodSugarRawForLog(String token, String tag) {
+        ApiService api = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        api.getBloodSugarRaw(token).enqueue(new Callback<ResponseBody>() {
+            @Override public void onResponse(Call<ResponseBody> c, Response<ResponseBody> r) {
+                try {
+                    String json = (r.body() != null) ? r.body().string() : null;
+                    Log.e(tag, "RAW JSON = " + json);
+                } catch (Exception e) {
+                    Log.e(tag, "read raw failed", e);
+                }
+            }
+            @Override public void onFailure(Call<ResponseBody> c, Throwable t) {
+                Log.e(tag, "raw api fail", t);
             }
         });
     }

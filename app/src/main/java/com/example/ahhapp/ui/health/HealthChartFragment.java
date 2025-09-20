@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
+import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import okhttp3.ResponseBody;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -178,7 +181,17 @@ public class HealthChartFragment extends Fragment implements EditProfileDialogFr
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         apiService.getBloodSugar(authHeader).enqueue(new Callback<GetBloodSugarResponse>() {
             @Override
-            public void onResponse(Call<GetBloodSugarResponse> call, Response<GetBloodSugarResponse> response) {
+            public void onResponse(Call<GetBloodSugarResponse> call,
+                                   Response<GetBloodSugarResponse> response) {
+
+                // ✅ 成功時把解析後物件印出
+                try {
+                    Log.d("BloodSugarAPI_Chart", "parsed body = " + new Gson().toJson(response.body()));
+                } catch (Exception e) {
+                    Log.e("BloodSugarAPI_Chart", "log parsed body failed", e);
+                }
+
+
                 if (!response.isSuccessful() || response.body() == null) {
                     Toast.makeText(getContext(), "血糖資料獲取失敗", Toast.LENGTH_SHORT).show();
                     return;
@@ -200,6 +213,12 @@ public class HealthChartFragment extends Fragment implements EditProfileDialogFr
                 SimpleDateFormat displayFormat = new SimpleDateFormat("MM-dd", Locale.getDefault());
 
                 for (GetBloodSugarResponse.BloodSugarData item : data) {
+                    // 🔎 逐筆印出
+                    Log.d("BloodSugarAPI_Chart:item",
+                            "date=" + item.getMeasurementDate()
+                                    + ", ctx=" + item.getMeasurementContext()
+                                    + ", val=" + item.getBloodSugar());
+
                     String dateKey = "";
                     try {
                         Date date = serverFormat.parse(item.getMeasurementDate());
@@ -209,10 +228,14 @@ public class HealthChartFragment extends Fragment implements EditProfileDialogFr
                     }
 
                     BloodSugarDay day = dayMap.getOrDefault(dateKey, new BloodSugarDay());
-                    if (item.getMeasurementContext() == 0) {
-                        day.fasting = (float) item.getBloodSugar();
-                    } else if (item.getMeasurementContext() == 2) {
-                        day.postMeal = (float) item.getBloodSugar();
+                    Integer ctx = item.getMeasurementContext();
+                    Double val = item.getBloodSugar();
+                    if (ctx == null || val == null) continue;
+
+                    if (ctx == 0 || ctx == 1) {
+                        day.fasting = val.floatValue();
+                    } else if (ctx == 2) {
+                        day.postMeal = val.floatValue();
                     }
                     dayMap.put(dateKey, day);
                 }
@@ -236,7 +259,7 @@ public class HealthChartFragment extends Fragment implements EditProfileDialogFr
                     index++;
                 }
 
-                LineDataSet set1 = createBeautifulDataSet(fastingEntries, "空腹血糖", Color.RED);
+                LineDataSet set1 = createBeautifulDataSet(fastingEntries, "空腹/餐前血糖", Color.RED);
                 LineDataSet set2 = createBeautifulDataSet(postMealEntries, "餐後血糖", Color.MAGENTA);
 
                 LineData lineData = new LineData(set1, set2);
@@ -251,7 +274,28 @@ public class HealthChartFragment extends Fragment implements EditProfileDialogFr
 
             @Override
             public void onFailure(Call<GetBloodSugarResponse> call, Throwable t) {
+                Log.e("BloodSugarAPI_Chart", "parse fail: " + t);
+                // ❗解析失敗就抓 RAW 來看
+                fetchBloodSugarRawForLog(authHeader, "BloodSugarRAW_Chart");
                 Toast.makeText(getContext(), "血糖 API 錯誤: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // 與 InfoFragment 同名方法即可（可抽到共用 utils）
+    private void fetchBloodSugarRawForLog(String token, String tag) {
+        ApiService api = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        api.getBloodSugarRaw(token).enqueue(new Callback<ResponseBody>() {
+            @Override public void onResponse(Call<ResponseBody> c, Response<ResponseBody> r) {
+                try {
+                    String json = (r.body() != null) ? r.body().string() : null;
+                    Log.e(tag, "RAW JSON = " + json);
+                } catch (Exception e) {
+                    Log.e(tag, "read raw failed", e);
+                }
+            }
+            @Override public void onFailure(Call<ResponseBody> c, Throwable t) {
+                Log.e(tag, "raw api fail", t);
             }
         });
     }
