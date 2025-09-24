@@ -1,5 +1,7 @@
 package com.example.ahhapp.ui.chat;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,8 +22,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ahhapp.adapter.ChatAdapter;
+import com.example.ahhapp.data.modle.AiChatRequest;
+import com.example.ahhapp.data.modle.AiChatSuccess;
+import com.example.ahhapp.data.modle.ApiErrorResponse;
 import com.example.ahhapp.data.modle.ChatMessage;
 import com.example.ahhapp.R;
+import com.example.ahhapp.network.ApiService;
+import com.example.ahhapp.network.RetrofitClient;
 import com.example.ahhapp.ui.profile.EditProfileDialogFragment;
 import com.example.ahhapp.utils.UserProfileManager;
 
@@ -33,6 +40,10 @@ import android.content.Intent;
 import android.content.ActivityNotFoundException;
 import android.content.pm.PackageManager;
 import android.speech.RecognizerIntent;
+import com.google.gson.Gson;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -63,6 +74,9 @@ public class AIChatFragment extends Fragment
     private Bitmap cachedAvatar = null;
     private String cachedUsername = null;
 
+    // === API service ===
+    private ApiService api;
+
     // === 語音輸入：權限＆結果 Launcher ===
     private final ActivityResultLauncher<String> micPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -89,7 +103,7 @@ public class AIChatFragment extends Fragment
                             return;
                         }
 
-                        // (A) 只填入輸入框，讓使用者確認後再送
+                        // (A) 填入輸入框，讓使用者確認後再送
                         if (etMessage != null) {
                             etMessage.setText(recognized);
                             etMessage.setSelection(recognized.length());
@@ -139,6 +153,9 @@ public class AIChatFragment extends Fragment
         chatAdapter = new ChatAdapter(getContext(), messageList);
         recyclerChat.setAdapter(chatAdapter);
 
+        // === Retrofit Service ===
+        api = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+
         // === 輸入與送出 ===
         etMessage = view.findViewById(R.id.etMessage);
         btnSend = view.findViewById(R.id.btnSend);
@@ -176,10 +193,10 @@ public class AIChatFragment extends Fragment
         recyclerChat.scrollToPosition(messageList.size() - 1);
         if (btnSend != null) btnSend.setEnabled(false);
 
-        // 3) 呼叫 API（此處用假呼叫），回來後替換內容
-        fakeCall(new AiCallback() {
+        // 3) 呼叫 AI API
+        callAi(msg, new AiCallback() {
             @Override public void onSuccess(String aiText) {
-                if (!isAdded()) return; // Fragment 已離開畫面
+                if (!isAdded()) return;
                 chatAdapter.removeTypingIfExists();
                 messageList.add(new ChatMessage(aiText, false));
                 chatAdapter.notifyItemInserted(messageList.size() - 1);
@@ -189,7 +206,7 @@ public class AIChatFragment extends Fragment
             @Override public void onError(String err) {
                 if (!isAdded()) return;
                 chatAdapter.removeTypingIfExists();
-                messageList.add(new ChatMessage("抱歉，連線太忙碌，請稍後再試。", false));
+                messageList.add(new ChatMessage(err, false));
                 chatAdapter.notifyItemInserted(messageList.size() - 1);
                 recyclerChat.scrollToPosition(messageList.size() - 1);
                 Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
@@ -211,7 +228,7 @@ public class AIChatFragment extends Fragment
     private void startVoiceInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-TW"); // 可改 Locale.getDefault()
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-TW"); // 可改 Locale.getDefault(),預設中文
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "請開始說話…");
         try {
             voiceInputLauncher.launch(intent);
@@ -222,19 +239,79 @@ public class AIChatFragment extends Fragment
         }
     }
 
-    // === 模擬 API ===
+    // === AI API 呼叫 ===
     private interface AiCallback {
         void onSuccess(String aiText);
         void onError(String err);
     }
 
-    private void fakeCall(AiCallback cb) {
-        // 使用 recyclerChat 發送延遲 runnable；若視圖已被銷毀就不執行
-        if (recyclerChat == null) return;
-        recyclerChat.postDelayed(() -> {
-            if (!isAdded() || recyclerChat == null) return;
-            cb.onSuccess("我有什麼能夠幫到您的嗎？");
-        }, 1200);
+    private void callAi(String userMessage, AiCallback cb) {
+        AiChatRequest body = new AiChatRequest(userMessage);
+        String token = getToken(); // "Bearer xxx" 或空字串
+
+        api.chatAi(token, body).enqueue(new Callback<AiChatSuccess>() {
+            @Override
+            public void onResponse(Call<AiChatSuccess> call, Response<AiChatSuccess> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null && response.body().data != null) {
+                    String text = response.body().data.response;
+                    cb.onSuccess(text != null ? text : "");
+                    return;
+                }
+
+                String friendly = mapError(response);
+                cb.onError(friendly);
+            }
+
+            @Override
+            public void onFailure(Call<AiChatSuccess> call, Throwable t) {
+                if (!isAdded()) return;
+                cb.onError("Network error. Please try again.");
+            }
+        });
+    }
+
+    /** 取出 Authorization header；換成你的實作（SharedPreferences/Session） */
+    private String getToken() {
+        SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("token", null);
+        if (token == null) {
+            Toast.makeText(getContext(), "尚未登入", Toast.LENGTH_SHORT).show();
+            return "";
+        }
+        return "Bearer " + token;
+    }
+
+    /** 錯誤碼提醒 */
+    private String mapError(Response<?> resp) {
+        int code = resp.code();
+        String apiMsg = parseApiError(resp);
+
+        if (code == 401) return "Unauthorized. Please sign in again.";
+        if (code == 404) return apiMsg != null ? apiMsg : "Health data not found. Please complete your basic profile.";
+        if (code == 408) return "AI server timeout. Please try again.";
+        if (code == 400) return apiMsg != null ? apiMsg : "Invalid input.";
+        if (code >= 500) return apiMsg != null ? apiMsg : "Server error. Please try later.";
+        return apiMsg != null ? apiMsg : "Request failed. Please retry.";
+    }
+
+    /** 嘗試解析後端錯誤 body（ApiErrorResponse） */
+    private @Nullable String parseApiError(Response<?> response) {
+        try {
+            if (response.errorBody() == null) return null;
+            String json = response.errorBody().string();
+            ApiErrorResponse err = new Gson().fromJson(json, ApiErrorResponse.class);
+            if (err != null && err.error != null) {
+                if (err.error.code != null && err.error.message != null) {
+                    return err.error.code + ": " + err.error.message;
+                }
+                if (err.error.message != null) return err.error.message;
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // === 導航（目前未使用，保留） ===

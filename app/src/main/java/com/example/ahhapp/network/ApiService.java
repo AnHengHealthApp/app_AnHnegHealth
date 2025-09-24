@@ -1,5 +1,6 @@
 package com.example.ahhapp.network;
 
+import com.example.ahhapp.data.modle.AiChatRequest;
 import com.example.ahhapp.data.modle.RegisterRequest;
 import com.example.ahhapp.data.modle.RegisterResponse;
 import com.example.ahhapp.data.modle.LoginRequest;
@@ -22,6 +23,7 @@ import com.example.ahhapp.data.modle.GetBloodSugarResponse;
 import com.example.ahhapp.data.modle.GetVitalsResponse;
 import com.example.ahhapp.data.modle.BasicHealthInfoResponse;
 import com.example.ahhapp.data.modle.UpdateUserProfileRequest;
+import com.example.ahhapp.data.modle.AiChatSuccess;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -122,7 +124,14 @@ public interface ApiService {
     @GET("user/avatar")
     Call<ResponseBody> getUserAvatar(@Header("Authorization") String token);
 
-
+    //取得血糖資料(檢查空值與型別)
     @GET("health/bloodSugar")
     Call<okhttp3.ResponseBody> getBloodSugarRaw(@Header("Authorization") String token);
+
+    //AI健康助手
+    @POST("ai/chat")
+    Call<AiChatSuccess> chatAi(
+            @Header("Authorization") String token,
+            @Body AiChatRequest request
+    );
 }
